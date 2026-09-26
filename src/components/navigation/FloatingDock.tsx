@@ -64,7 +64,7 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({
             <div
               className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-200 cursor-pointer min-h-[38px] ${
                 item.accent
-                  ? 'text-[#FF9F45] bg-[#FF9F45]/15 hover:bg-[#FF9F45]/25 border border-[#FF9F45]/40 shadow-[0_0_12px_rgba(255,159,69,0.3)]'
+                  ? 'text-[#7B61FF] bg-[#7B61FF]/15 hover:bg-[#7B61FF]/25 border border-[#7B61FF]/40 shadow-[0_0_12px_rgba(123,97,255,0.25)]'
                   : item.isSpecial
                   ? 'text-[#00D4FF] bg-[#00D4FF]/15 hover:bg-[#00D4FF]/25 border border-[#00D4FF]/50 shadow-[0_0_14px_rgba(0,212,255,0.35)]'
                   : 'text-[#EAF2F5]/85 hover:text-[#00D4FF] hover:bg-[#12161C] border border-[#182028] hover:border-[#00D4FF]/30'

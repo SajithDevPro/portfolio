@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
 import { PROJECTS } from '../../data/portfolioData';
 import { WindowChrome } from '../common/WindowChrome';
 import { Project, ActiveNode } from '../../types';
@@ -12,10 +13,28 @@ interface ProjectsSectionProps {
 export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   onNavigate,
   selectedProjectSlug,
-  onSelectProject
+  onSelectProject,
 }) => {
   const [filter, setFilter] = useState<'all' | 'robotics' | 'ai_ml' | 'cloud'>('all');
   const [internalSlug, setInternalSlug] = useState<string | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  // Scroll-linked depth transforms (Requirement 1)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
+
+  const rawScale = useTransform(scrollYProgress, [0, 0.22, 0.78, 1], [0.93, 1, 1, 0.96]);
+  const rawY = useTransform(scrollYProgress, [0, 0.22, 0.78, 1], [40, 0, 0, -25]);
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.22, 0.78, 1], [3, 0, 0, -2]);
+  const rawOpacity = useTransform(scrollYProgress, [0, 0.16, 0.84, 1], [0.35, 1, 1, 0.45]);
+
+  const scale = shouldReduceMotion ? 1 : rawScale;
+  const y = shouldReduceMotion ? 0 : rawY;
+  const rotateX = shouldReduceMotion ? 0 : rawRotateX;
+  const opacity = rawOpacity;
 
   const activeSlug = selectedProjectSlug !== undefined ? selectedProjectSlug : internalSlug;
   const setActiveSlug = (slug: string | null) => {
@@ -50,16 +69,24 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   // PAGE B: Dedicated Project Deep-Dive Node
   if (selectedProject) {
     return (
-      <section
+      <motion.section
+        ref={sectionRef}
         id="project-detail"
         aria-label={`Project: ${selectedProject.title}`}
+        style={{
+          scale,
+          y,
+          rotateX,
+          opacity,
+          transformPerspective: 1200,
+        }}
         className="relative w-full py-8 sm:py-14 flex flex-col gap-8 animate-fadeIn"
       >
         {/* Navigation & Breadcrumb Header */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <button
             onClick={() => setActiveSlug(null)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#182028] hover:bg-[#202934] border border-[#00D4FF]/30 text-[#00D4FF] font-code text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer group active:scale-95"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#182028] hover:bg-[#202934] border border-[#00D4FF]/25 text-[#00D4FF] font-code text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer group active:scale-95"
           >
             <span className="material-symbols-outlined text-base group-hover:-translate-x-1 transition-transform">
               arrow_back
@@ -71,7 +98,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrev}
-              className="flex items-center gap-1 px-3 py-1.5 rounded bg-[#12161C] hover:bg-[#182028] border border-[#182028] hover:border-[#00D4FF]/40 text-[#EAF2F5] font-code text-xs transition-colors cursor-pointer"
+              className="flex items-center gap-1 px-3 py-1.5 rounded bg-[#12161C] hover:bg-[#182028] border border-[#182028] hover:border-[#00D4FF]/30 text-[#EAF2F5] font-code text-xs transition-colors cursor-pointer"
               title="Previous project"
             >
               <span className="material-symbols-outlined text-sm">navigate_before</span>
@@ -82,7 +109,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
             </span>
             <button
               onClick={handleNext}
-              className="flex items-center gap-1 px-3 py-1.5 rounded bg-[#12161C] hover:bg-[#182028] border border-[#182028] hover:border-[#00D4FF]/40 text-[#EAF2F5] font-code text-xs transition-colors cursor-pointer"
+              className="flex items-center gap-1 px-3 py-1.5 rounded bg-[#12161C] hover:bg-[#182028] border border-[#182028] hover:border-[#00D4FF]/30 text-[#EAF2F5] font-code text-xs transition-colors cursor-pointer"
               title="Next project"
             >
               <span className="hidden sm:inline">NEXT</span>
@@ -92,26 +119,34 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         </div>
 
         {/* Master Project Spec Sheet Card */}
-        <div className="rounded-2xl bg-[#12161C] border border-[#00D4FF]/25 shadow-[0_16px_48px_rgba(0,0,0,0.7)] overflow-hidden flex flex-col">
+        <div className="rounded-2xl bg-[#12161C] border border-[#00D4FF]/20 shadow-[0_16px_48px_rgba(0,0,0,0.7)] overflow-hidden flex flex-col">
           <WindowChrome
             title={`schematic_${selectedProject.slug}.v4`}
             icon="memory"
             tag={selectedProject.categoryLabel.toUpperCase()}
           />
 
-          {/* Large Hero Visual with Circuit Cutout and Assembly Frame */}
+          {/* Responsive WebP Visual with Lazy Loading (Requirement 4) */}
           <div className="relative w-full h-[260px] sm:h-[380px] lg:h-[440px] bg-[#0B0F13] overflow-hidden">
-            <img
-              src={selectedProject.image}
-              alt={selectedProject.title}
-              className="w-full h-full object-cover object-center filter contrast-105"
-            />
+            <picture>
+              {selectedProject.imageMobile && (
+                <source media="(max-width: 640px)" srcSet={selectedProject.imageMobile} type="image/webp" />
+              )}
+              <source srcSet={selectedProject.image} type="image/webp" />
+              <img
+                src={selectedProject.image}
+                alt={selectedProject.title}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover object-center filter contrast-105"
+              />
+            </picture>
             {/* Scrim Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#12161C] via-[#12161C]/40 to-transparent" />
 
             {/* Float Info Banner */}
             <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-2">
-              <span className="px-2.5 py-1 rounded bg-[#0A0E12]/90 text-[#00D4FF] border border-[#00D4FF]/40 font-code text-xs w-fit">
+              <span className="px-2.5 py-1 rounded bg-[#0A0E12]/90 text-[#00D4FF] border border-[#00D4FF]/30 font-code text-xs w-fit">
                 {selectedProject.categoryLabel}
               </span>
               <h1 className="font-display text-2xl sm:text-4xl font-bold text-[#EAF2F5]">
@@ -139,10 +174,10 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
               ))}
             </div>
 
-            {/* Problem & Approach */}
+            {/* Problem & Approach (Cleaned Amber -> Violet/Cyan) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="p-5 rounded-xl bg-[#0B0F13]/60 border border-[#182028] flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-xs font-code text-[#FF9F45]">
+                <div className="flex items-center gap-2 text-xs font-code text-[#7B61FF]">
                   <span className="material-symbols-outlined text-sm">warning</span>
                   <span className="font-semibold uppercase tracking-wider">PROBLEM STATEMENT</span>
                 </div>
@@ -165,9 +200,9 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
             {/* My Role & Quantitative Result */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="p-5 rounded-xl bg-[#0B0F13]/60 border border-[#182028] flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-xs font-code text-[#7B61FF]">
+                <div className="flex items-center gap-2 text-xs font-code text-[#5B6B75]">
                   <span className="material-symbols-outlined text-sm">badge</span>
-                  <span className="font-semibold uppercase tracking-wider">ENGINEERING ROLE</span>
+                  <span className="font-semibold uppercase tracking-wider text-[#EAF2F5]/90">ENGINEERING ROLE</span>
                 </div>
                 <p className="font-body text-sm text-[#EAF2F5]/85 leading-relaxed">
                   {selectedProject.role}
@@ -194,7 +229,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                 {selectedProject.stack.map((item, idx) => (
                   <span
                     key={idx}
-                    className="px-3 py-1 rounded bg-[#0B0F13] text-[#00D4FF] border border-[#00D4FF]/25 font-code text-xs font-medium shadow-sm"
+                    className="px-3 py-1 rounded bg-[#0B0F13] text-[#00D4FF] border border-[#00D4FF]/20 font-code text-xs font-medium shadow-sm"
                   >
                     {item}
                   </span>
@@ -202,14 +237,14 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
               </div>
             </div>
 
-            {/* Action Buttons */}
+            {/* Action Buttons (Amber replaced with Cyan/Slate) */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-[#182028]">
               {selectedProject.githubUrl && (
                 <a
                   href={selectedProject.githubUrl}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="px-5 py-2.5 rounded-lg bg-[#182028] hover:bg-[#202934] border border-[#00D4FF]/30 hover:border-[#00D4FF] text-[#00D4FF] font-display font-semibold text-xs tracking-wider uppercase flex items-center justify-center gap-2 transition-all"
+                  className="px-5 py-2.5 rounded-lg bg-[#182028] hover:bg-[#202934] border border-[#00D4FF]/25 hover:border-[#00D4FF] text-[#00D4FF] font-display font-semibold text-xs tracking-wider uppercase flex items-center justify-center gap-2 transition-all"
                 >
                   <span className="material-symbols-outlined text-base">code_blocks</span>
                   <span>VIEW REPOSITORY</span>
@@ -218,7 +253,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
 
               <button
                 onClick={() => onNavigate('contact')}
-                className="px-5 py-2.5 rounded-lg bg-[#FF9F45] hover:bg-[#ffb066] text-[#2E1500] font-display font-semibold text-xs tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_16px_rgba(255,159,69,0.3)]"
+                className="px-5 py-2.5 rounded-lg bg-[#182028] hover:bg-[#202934] border border-[#00D4FF]/40 hover:border-[#00D4FF] text-[#00D4FF] hover:text-[#EAF2F5] font-display font-semibold text-xs tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95"
               >
                 <span className="material-symbols-outlined text-base">mail</span>
                 <span>DISCUSS ARCHITECTURE</span>
@@ -226,26 +261,34 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
     );
   }
 
   // PAGE A: Projects Index (Module Grid Node)
   return (
-    <section
+    <motion.section
+      ref={sectionRef}
       id="projects"
       aria-label="Projects Schematics"
+      style={{
+        scale,
+        y,
+        rotateX,
+        opacity,
+        transformPerspective: 1200,
+      }}
       className="relative w-full py-8 sm:py-14 flex flex-col gap-8"
     >
       {/* Node Marker Header */}
-      <div className="flex items-center justify-between px-3.5 py-1.5 rounded-full bg-[#12161C]/80 border border-[#00D4FF]/20 backdrop-blur-md max-w-lg">
+      <div className="flex items-center justify-between px-3.5 py-1.5 rounded-full bg-[#12161C]/80 border border-[#00D4FF]/15 backdrop-blur-md max-w-lg">
         <div className="flex items-center gap-2 min-w-0">
           <span className="w-2 h-2 rounded-full bg-[#00D4FF] animate-pulse" />
           <span className="font-code text-xs text-[#00D4FF] uppercase tracking-wider truncate">
             03 // FEATURED PROJECTS &amp; SCHEMATICS
           </span>
         </div>
-        <span className="px-2 py-0.5 rounded bg-[#182028] text-[#7B61FF] font-code text-[11px] font-medium shrink-0">
+        <span className="px-2 py-0.5 rounded bg-[#182028] text-[#5B6B75] font-code text-[11px] font-medium shrink-0 border border-[#182028]">
           Index
         </span>
       </div>
@@ -261,14 +304,14 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
           </p>
         </div>
 
-        {/* Segmented Filter Toggle with Sliding Glow Indicator */}
-        <div className="flex items-center p-1 rounded-xl bg-[#12161C] border border-[#00D4FF]/20 backdrop-blur-md shadow-inner">
+        {/* Segmented Filter Toggle with Sliding Indicator */}
+        <div className="flex items-center p-1 rounded-xl bg-[#12161C] border border-[#182028] backdrop-blur-md shadow-inner">
           {(
             [
               { id: 'all', label: 'ALL' },
               { id: 'robotics', label: 'ROBOTICS' },
               { id: 'ai_ml', label: 'AI/ML' },
-              { id: 'cloud', label: 'CLOUD' }
+              { id: 'cloud', label: 'CLOUD' },
             ] as const
           ).map((item) => {
             const isActive = filter === item.id;
@@ -278,7 +321,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                 onClick={() => setFilter(item.id)}
                 className={`px-3 sm:px-4 py-1.5 rounded-lg font-code text-xs tracking-wider transition-all duration-200 cursor-pointer ${
                   isActive
-                    ? 'bg-[#00D4FF] text-[#0A0E12] font-bold shadow-[0_0_14px_rgba(0,212,255,0.6)]'
+                    ? 'bg-[#00D4FF] text-[#0A0E12] font-bold shadow-[0_0_12px_rgba(0,212,255,0.4)]'
                     : 'text-[#5B6B75] hover:text-[#EAF2F5]'
                 }`}
               >
@@ -295,7 +338,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
           <div
             key={project.id}
             onClick={() => setActiveSlug(project.slug)}
-            className="group relative rounded-2xl bg-[#12161C] border border-[#00D4FF]/15 hover:border-[#00D4FF] transition-all duration-300 flex flex-col overflow-hidden shadow-lg hover:shadow-[0_12px_36px_rgba(0,212,255,0.18)] hover:-translate-y-1.5 cursor-pointer"
+            className="group relative rounded-2xl bg-[#12161C] border border-[#182028] hover:border-[#00D4FF]/40 transition-all duration-300 flex flex-col overflow-hidden shadow-lg hover:shadow-[0_12px_36px_rgba(0,212,255,0.12)] hover:-translate-y-1.5 cursor-pointer"
           >
             <WindowChrome
               title={`${project.slug}.md`}
@@ -304,21 +347,29 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
               actionText="VIEW ›"
             />
 
-            {/* Thumbnail with parallax zoom */}
+            {/* Thumbnail with Responsive WebP & Lazy Loading */}
             <div className="relative w-full h-48 sm:h-56 bg-[#0B0F13] overflow-hidden">
-              <img
-                src={project.image}
-                alt={project.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-              />
+              <picture>
+                {project.imageMobile && (
+                  <source media="(max-width: 640px)" srcSet={project.imageMobile} type="image/webp" />
+                )}
+                <source srcSet={project.image} type="image/webp" />
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                />
+              </picture>
               <div className="absolute inset-0 bg-gradient-to-t from-[#12161C] via-[#12161C]/30 to-transparent" />
 
               {/* Curiosity Gap One-Line Result Banner */}
               <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
-                <span className="px-2.5 py-1 rounded bg-[#0A0E12]/90 border border-[#00D4FF]/30 font-code text-[11px] text-[#00D4FF] font-medium backdrop-blur-md">
+                <span className="px-2.5 py-1 rounded bg-[#0A0E12]/90 border border-[#00D4FF]/25 font-code text-[11px] text-[#00D4FF] font-medium backdrop-blur-md">
                   {project.outcome}
                 </span>
-                <span className="font-code text-[10px] text-[#FF9F45] bg-[#12161C]/90 px-2 py-0.5 rounded border border-[#FF9F45]/30">
+                <span className="font-code text-[10px] text-[#EAF2F5] bg-[#182028]/90 px-2 py-0.5 rounded border border-[#182028] group-hover:border-[#00D4FF]/40 transition-colors">
                   DETAILS ›
                 </span>
               </div>
@@ -355,6 +406,6 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
           </div>
         ))}
       </div>
-    </section>
+    </motion.section>
   );
 };

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
 import { PROFILE_IMAGE, TELEMETRY_STATS } from '../../data/portfolioData';
 import { WindowChrome } from '../common/WindowChrome';
 import { ActiveNode } from '../../types';
@@ -9,11 +10,29 @@ interface AboutSectionProps {
 }
 
 export const AboutSection: React.FC<AboutSectionProps> = ({
-  onNavigate,
+  onNavigate: _onNavigate,
   onOpenResume
 }) => {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [copiedUplink, setCopiedUplink] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  // Scroll-linked transforms (Requirement 1)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
+
+  const rawScale = useTransform(scrollYProgress, [0, 0.22, 0.78, 1], [0.93, 1, 1, 0.96]);
+  const rawY = useTransform(scrollYProgress, [0, 0.22, 0.78, 1], [40, 0, 0, -25]);
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.22, 0.78, 1], [3, 0, 0, -2]);
+  const rawOpacity = useTransform(scrollYProgress, [0, 0.16, 0.84, 1], [0.35, 1, 1, 0.45]);
+
+  const scale = shouldReduceMotion ? 1 : rawScale;
+  const y = shouldReduceMotion ? 0 : rawY;
+  const rotateX = shouldReduceMotion ? 0 : rawRotateX;
+  const opacity = rawOpacity;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -33,20 +52,28 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
   };
 
   return (
-    <section
+    <motion.section
+      ref={sectionRef}
       id="about"
       aria-label="About Elara Vance"
+      style={{
+        scale,
+        y,
+        rotateX,
+        opacity,
+        transformPerspective: 1200,
+      }}
       className="relative w-full py-8 sm:py-14 flex flex-col gap-8"
     >
       {/* Node Marker Header */}
-      <div className="flex items-center justify-between px-3.5 py-1.5 rounded-full bg-[#12161C]/80 border border-[#00D4FF]/20 backdrop-blur-md max-w-lg">
+      <div className="flex items-center justify-between px-3.5 py-1.5 rounded-full bg-[#12161C]/80 border border-[#00D4FF]/15 backdrop-blur-md max-w-lg">
         <div className="flex items-center gap-2 min-w-0">
           <span className="w-2 h-2 rounded-full bg-[#00D4FF] animate-pulse" />
           <span className="font-code text-xs text-[#00D4FF] uppercase tracking-wider truncate">
             01 // PROFILE &amp; BACKGROUND
           </span>
         </div>
-        <span className="px-2 py-0.5 rounded bg-[#182028] text-[#5B6B75] font-code text-[11px] font-medium shrink-0">
+        <span className="px-2 py-0.5 rounded bg-[#182028] text-[#5B6B75] font-code text-[11px] font-medium shrink-0 border border-[#182028]">
           Verified
         </span>
       </div>
@@ -65,7 +92,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left: Assembling Portrait in Hexagonal / Circuit Frame */}
         <div className="lg:col-span-5 flex flex-col gap-4">
-          <div className="rounded-xl bg-[#12161C] border border-[#00D4FF]/20 shadow-[0_12px_40px_rgba(0,0,0,0.6)] overflow-hidden">
+          <div className="rounded-xl bg-[#12161C] border border-[#00D4FF]/15 shadow-[0_12px_40px_rgba(0,0,0,0.6)] overflow-hidden">
             <WindowChrome
               title="elara_portrait.jpg"
               icon="photo_camera"
@@ -78,40 +105,40 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
               onMouseLeave={handleMouseLeave}
               className="relative p-6 sm:p-8 flex flex-col items-center justify-center bg-[#0B0F13] overflow-hidden"
               style={{
-                perspective: '1000px'
+                perspective: '1000px',
               }}
             >
               {/* Corner Circuit Brackets */}
-              <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-[#00D4FF]" />
-              <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-[#00D4FF]" />
-              <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-[#00D4FF]" />
-              <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-[#00D4FF]" />
+              <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-[#00D4FF]/50" />
+              <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-[#00D4FF]/50" />
+              <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-[#00D4FF]/50" />
+              <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-[#00D4FF]/50" />
 
               {/* Hexagonal Image Frame with dynamic tilt */}
               <div
                 className="relative w-64 h-64 sm:w-72 sm:h-72 transition-transform duration-200 ease-out"
                 style={{
-                  transform: `rotateY(${tilt.x}deg) rotateX(${tilt.y}deg)`
+                  transform: `rotateY(${tilt.x}deg) rotateX(${tilt.y}deg)`,
                 }}
               >
-                {/* Outer SVG Circuit Stroke that draws itself */}
+                {/* Outer SVG Circuit Stroke */}
                 <svg
-                  className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-[0_0_12px_rgba(0,212,255,0.6)]"
+                  className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"
                   viewBox="0 0 100 100"
                 >
                   <polygon
                     points="50,2 93,25 93,75 50,98 7,75 7,25"
                     fill="none"
                     stroke="#00D4FF"
-                    strokeWidth="1.5"
+                    strokeWidth="1.2"
                     strokeDasharray="300"
                     strokeDashoffset="0"
-                    className="animate-pulse"
+                    className="opacity-70"
                   />
                   <circle cx="50" cy="2" r="1.5" fill="#00D4FF" />
                   <circle cx="93" cy="25" r="1.5" fill="#7B61FF" />
                   <circle cx="93" cy="75" r="1.5" fill="#00D4FF" />
-                  <circle cx="50" cy="98" r="1.5" fill="#FF9F45" />
+                  <circle cx="50" cy="98" r="1.5" fill="#7B61FF" />
                   <circle cx="7" cy="75" r="1.5" fill="#7B61FF" />
                   <circle cx="7" cy="25" r="1.5" fill="#00D4FF" />
                 </svg>
@@ -129,20 +156,20 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
                 </div>
 
                 {/* Bottom telemetry overlay badge */}
-                <div className="absolute bottom-4 right-4 z-10 px-2 py-0.5 rounded bg-[#0A0E12]/90 border border-[#00D4FF]/30 font-code text-[10px] text-[#00D4FF]">
+                <div className="absolute bottom-4 right-4 z-10 px-2 py-0.5 rounded bg-[#0A0E12]/90 border border-[#00D4FF]/25 font-code text-[10px] text-[#00D4FF]">
                   LAT: 47.6062° N
                 </div>
               </div>
 
-              {/* Synapse Verification Hash */}
+              {/* Identity Verification Hash */}
               <div className="mt-5 w-full flex items-center justify-between px-3 py-1.5 rounded bg-[#12161C] border border-[#182028] font-code text-[11px] text-[#5B6B75]">
                 <span className="flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[13px] text-[#00D4FF]">
+                  <span className="material-symbols-outlined text-[13px] text-[#5B6B75]">
                     fingerprint
                   </span>
-                  SYNAPSE_HASH: 0x9B4E...A1F0
+                  SIGNATURE_ID: 0x9B4E...A1F0
                 </span>
-                <span className="text-[#00D4FF] font-semibold">SIG_VERIFIED</span>
+                <span className="text-[#00D4FF] font-medium">AUTHENTICATED</span>
               </div>
             </div>
           </div>
@@ -151,7 +178,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
         {/* Right: Structured System Spec Sheet & Telemetry */}
         <div className="lg:col-span-7 flex flex-col gap-6">
           {/* System Spec Sheet Readout */}
-          <div className="p-6 rounded-xl bg-[#12161C] border border-[#00D4FF]/20 shadow-md flex flex-col gap-4">
+          <div className="p-6 rounded-xl bg-[#12161C] border border-[#00D4FF]/15 shadow-md flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-[#182028] pb-3">
               <span className="font-display font-semibold text-sm tracking-wider uppercase text-[#00D4FF]">
                 ENGINEER SPECIFICATIONS
@@ -197,7 +224,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
 
               <div className="flex flex-col sm:flex-row sm:justify-between py-1.5">
                 <span className="text-[#5B6B75] uppercase tracking-wider">AVAILABILITY</span>
-                <span className="text-[#FF9F45] font-semibold">
+                <span className="text-[#00D4FF] font-semibold">
                   ACCEPTING ROBOTICS &amp; EMBODIED AI ROLES (2025/2026)
                 </span>
               </div>
@@ -209,11 +236,11 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
             {TELEMETRY_STATS.map((stat, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-xl bg-[#12161C] border border-[#00D4FF]/15 flex flex-col gap-2 relative overflow-hidden group hover:border-[#00D4FF]/40 transition-colors"
+                className="p-4 rounded-xl bg-[#12161C] border border-[#00D4FF]/10 flex flex-col gap-2 relative overflow-hidden group hover:border-[#00D4FF]/30 transition-colors"
               >
                 <div className="flex items-center justify-between text-[#5B6B75] text-[11px] font-code">
                   <span>{stat.label}</span>
-                  <span className="material-symbols-outlined text-[15px] text-[#00D4FF]">
+                  <span className="material-symbols-outlined text-[15px] text-[#5B6B75] group-hover:text-[#00D4FF] transition-colors">
                     {stat.icon}
                   </span>
                 </div>
@@ -238,7 +265,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
           </div>
 
           {/* Philosophy Statement */}
-          <div className="p-4 rounded-xl bg-[#0B0F13] border border-[#7B61FF]/20 flex items-start gap-3">
+          <div className="p-4 rounded-xl bg-[#0B0F13] border border-[#7B61FF]/15 flex items-start gap-3">
             <span className="material-symbols-outlined text-lg text-[#7B61FF] shrink-0 mt-0.5">
               psychology
             </span>
@@ -252,7 +279,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
             </div>
           </div>
 
-          {/* Action CTAs */}
+          {/* Action CTAs (Cleaned Amber -> Cyan / Dark Cybernetic) */}
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <button
               onClick={() => {
@@ -262,7 +289,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
                   alert('Resume PDF downloaded: Elara_Vance_Software_Systems_Engineer.pdf');
                 }
               }}
-              className="min-h-[46px] flex-1 px-5 py-2.5 rounded-lg bg-[#FF9F45] hover:bg-[#ffb066] text-[#2E1500] font-display font-semibold text-sm tracking-wider uppercase flex items-center justify-center gap-2 shadow-[0_0_18px_rgba(255,159,69,0.3)] active:scale-95 transition-all cursor-pointer"
+              className="min-h-[46px] flex-1 px-5 py-2.5 rounded-lg bg-[#182028] hover:bg-[#202934] text-[#00D4FF] hover:text-[#EAF2F5] border border-[#00D4FF]/35 hover:border-[#00D4FF] font-display font-semibold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-all cursor-pointer"
             >
               <span className="material-symbols-outlined text-base">download</span>
               <span>DOWNLOAD RESUME (PDF)</span>
@@ -270,9 +297,9 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
 
             <button
               onClick={handleCopyUplink}
-              className="min-h-[46px] flex-1 px-5 py-2.5 rounded-lg bg-[#182028] hover:bg-[#202934] border border-[#00D4FF]/30 hover:border-[#00D4FF] text-[#00D4FF] font-display font-semibold text-sm tracking-wider uppercase flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer"
+              className="min-h-[46px] flex-1 px-5 py-2.5 rounded-lg bg-[#12161C] hover:bg-[#182028] border border-[#182028] hover:border-[#00D4FF]/30 text-[#EAF2F5] font-display font-semibold text-xs tracking-wider uppercase flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer"
             >
-              <span className="material-symbols-outlined text-base">
+              <span className="material-symbols-outlined text-base text-[#5B6B75]">
                 {copiedUplink ? 'check_circle' : 'content_copy'}
               </span>
               <span>{copiedUplink ? 'EMAIL COPIED TO CLIPBOARD' : 'COPY DIRECT EMAIL'}</span>
@@ -280,6 +307,6 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };

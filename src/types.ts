@@ -9,6 +9,7 @@ export interface Project {
   tagline: string;
   outcome: string;
   image: string;
+  imageMobile?: string;
   problem: string;
   approach: string;
   stack: string[];

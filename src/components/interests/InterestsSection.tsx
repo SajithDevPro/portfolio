@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
 import { INTERESTS } from '../../data/portfolioData';
-import { WindowChrome } from '../common/WindowChrome';
 import { ActiveNode } from '../../types';
 
 interface InterestsSectionProps {
@@ -8,21 +8,48 @@ interface InterestsSectionProps {
 }
 
 export const InterestsSection: React.FC<InterestsSectionProps> = ({ onNavigate }) => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  // Scroll-linked physical depth transforms (Requirement 1)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
+
+  const rawScale = useTransform(scrollYProgress, [0, 0.22, 0.78, 1], [0.93, 1, 1, 0.96]);
+  const rawY = useTransform(scrollYProgress, [0, 0.22, 0.78, 1], [40, 0, 0, -25]);
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.22, 0.78, 1], [3, 0, 0, -2]);
+  const rawOpacity = useTransform(scrollYProgress, [0, 0.16, 0.84, 1], [0.35, 1, 1, 0.45]);
+
+  const scale = shouldReduceMotion ? 1 : rawScale;
+  const y = shouldReduceMotion ? 0 : rawY;
+  const rotateX = shouldReduceMotion ? 0 : rawRotateX;
+  const opacity = rawOpacity;
+
   return (
-    <section
+    <motion.section
+      ref={sectionRef}
       id="interests"
       aria-label="Interests & Human Peripherals"
+      style={{
+        scale,
+        y,
+        rotateX,
+        opacity,
+        transformPerspective: 1200,
+      }}
       className="relative w-full py-8 sm:py-14 flex flex-col gap-8"
     >
       {/* Node Marker Header */}
-      <div className="flex items-center justify-between px-3.5 py-1.5 rounded-full bg-[#12161C]/80 border border-[#7B61FF]/25 backdrop-blur-md max-w-lg">
+      <div className="flex items-center justify-between px-3.5 py-1.5 rounded-full bg-[#12161C]/80 border border-[#7B61FF]/20 backdrop-blur-md max-w-lg">
         <div className="flex items-center gap-2 min-w-0">
           <span className="w-2 h-2 rounded-full bg-[#7B61FF] animate-pulse" />
           <span className="font-code text-xs text-[#7B61FF] uppercase tracking-wider truncate">
             04 // RESEARCH &amp; LAB INTERESTS
           </span>
         </div>
-        <span className="px-2 py-0.5 rounded bg-[#182028] text-[#FF9F45] font-code text-[11px] font-medium shrink-0 border border-[#FF9F45]/20">
+        <span className="px-2 py-0.5 rounded bg-[#182028] text-[#5B6B75] font-code text-[11px] font-medium shrink-0 border border-[#182028]">
           Exploration
         </span>
       </div>
@@ -37,19 +64,19 @@ export const InterestsSection: React.FC<InterestsSectionProps> = ({ onNavigate }
         </p>
       </div>
 
-      {/* Satellite Cards Grid with Warm Amber / Violet Touches */}
+      {/* Satellite Cards Grid with Violet / Cyan Accents (Amber Removed per Rule 3) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {INTERESTS.map((item) => (
           <div
             key={item.id}
-            className="group relative rounded-2xl bg-[#12161C] border border-[#7B61FF]/20 hover:border-[#FF9F45]/50 transition-all duration-300 p-5 flex flex-col gap-4 overflow-hidden shadow-md hover:shadow-[0_8px_30px_rgba(255,159,69,0.15)] hover:-translate-y-1"
+            className="group relative rounded-2xl bg-[#12161C] border border-[#182028] hover:border-[#7B61FF]/40 transition-all duration-300 p-5 flex flex-col gap-4 overflow-hidden shadow-md hover:shadow-[0_8px_30px_rgba(123,97,255,0.12)] hover:-translate-y-1"
           >
-            {/* Ambient Radial Warmth on Hover */}
-            <div className="absolute -top-12 -right-12 w-28 h-28 bg-[#FF9F45]/10 rounded-full blur-2xl group-hover:bg-[#FF9F45]/20 transition-all pointer-events-none" />
+            {/* Ambient Radial Accent on Hover */}
+            <div className="absolute -top-12 -right-12 w-28 h-28 bg-[#7B61FF]/10 rounded-full blur-2xl group-hover:bg-[#7B61FF]/20 transition-all pointer-events-none" />
 
             {/* Header Icon + Tag */}
             <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-[#182028] border border-[#7B61FF]/30 text-[#7B61FF] group-hover:text-[#FF9F45] group-hover:border-[#FF9F45]/40 flex items-center justify-center transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-[#182028] border border-[#182028] text-[#5B6B75] group-hover:text-[#7B61FF] group-hover:border-[#7B61FF]/40 flex items-center justify-center transition-colors">
                 <span className="material-symbols-outlined text-[20px]">
                   {item.icon}
                 </span>
@@ -61,10 +88,10 @@ export const InterestsSection: React.FC<InterestsSectionProps> = ({ onNavigate }
 
             {/* Title & Short Phrase */}
             <div className="flex flex-col gap-1">
-              <h3 className="font-display text-base font-bold text-[#EAF2F5] group-hover:text-[#FF9F45] transition-colors">
+              <h3 className="font-display text-base font-bold text-[#EAF2F5] group-hover:text-[#00D4FF] transition-colors">
                 {item.title}
               </h3>
-              <span className="font-code text-xs text-[#00D4FF]/90">
+              <span className="font-code text-xs text-[#00D4FF]/80">
                 {item.phrase}
               </span>
             </div>
@@ -81,12 +108,12 @@ export const InterestsSection: React.FC<InterestsSectionProps> = ({ onNavigate }
       <div className="flex items-center justify-center pt-4">
         <button
           onClick={() => onNavigate('contact')}
-          className="flex items-center gap-2 text-xs font-code text-[#FF9F45] hover:text-[#ffb066] transition-colors cursor-pointer"
+          className="flex items-center gap-2 text-xs font-code text-[#00D4FF] hover:text-[#EAF2F5] transition-colors cursor-pointer"
         >
           <span>PROCEED TO CONTACT FORM ›</span>
           <span className="material-symbols-outlined text-sm">arrow_downward</span>
         </button>
       </div>
-    </section>
+    </motion.section>
   );
 };

@@ -198,7 +198,7 @@ export default function App() {
         />
 
         {/* Hairline circuit divider */}
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-[#FF9F45]/20 to-transparent" />
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-[#7B61FF]/15 to-transparent" />
 
         {/* Node 04: Interests — Human Peripherals */}
         <InterestsSection onNavigate={handleNavigate} />

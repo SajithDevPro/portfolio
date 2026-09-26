@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { WindowChrome } from '../common/WindowChrome';
 
 interface CodeSnippet {
@@ -57,40 +57,64 @@ const SNIPPETS: CodeSnippet[] = [
 interface HeroTerminalProps {
   onLineCompiled?: (lineIndex: number) => void;
   onSnippetCycle?: () => void;
+  scrollIntensity?: number;
 }
 
 export const HeroTerminal: React.FC<HeroTerminalProps> = ({
   onLineCompiled,
-  onSnippetCycle
+  onSnippetCycle,
+  scrollIntensity = 1.0,
 }) => {
   const [snippetIndex, setSnippetIndex] = useState(0);
   const [displayedLineCount, setDisplayedLineCount] = useState(1);
   const currentSnippet = SNIPPETS[snippetIndex];
+  const prevLineCountRef = useRef(1);
 
+  // Line advancement timer
   useEffect(() => {
     const timer = setInterval(() => {
       setDisplayedLineCount((prev) => {
         if (prev < currentSnippet.lines.length) {
-          const next = prev + 1;
-          onLineCompiled?.(next);
-          return next;
-        } else {
-          // Pause briefly, then cycle to next snippet
-          setTimeout(() => {
-            setSnippetIndex((idx) => (idx + 1) % SNIPPETS.length);
-            setDisplayedLineCount(1);
-            onSnippetCycle?.();
-          }, 2400);
-          return prev;
+          return prev + 1;
         }
+        return prev;
       });
     }, 700);
 
     return () => clearInterval(timer);
-  }, [currentSnippet.lines.length, onLineCompiled, onSnippetCycle]);
+  }, [currentSnippet.lines.length]);
+
+  // Snippet cycling after full snippet is displayed
+  useEffect(() => {
+    if (displayedLineCount >= currentSnippet.lines.length) {
+      const cycleTimer = setTimeout(() => {
+        setSnippetIndex((idx) => (idx + 1) % SNIPPETS.length);
+        setDisplayedLineCount(1);
+        prevLineCountRef.current = 1;
+        onSnippetCycle?.();
+      }, 2400);
+
+      return () => clearTimeout(cycleTimer);
+    }
+  }, [displayedLineCount, currentSnippet.lines.length, onSnippetCycle]);
+
+  // Safely notify parent outside of render cycle
+  useEffect(() => {
+    if (displayedLineCount > prevLineCountRef.current) {
+      onLineCompiled?.(displayedLineCount);
+      prevLineCountRef.current = displayedLineCount;
+    }
+  }, [displayedLineCount, onLineCompiled]);
 
   return (
-    <div className="flex flex-col w-full rounded-xl bg-[#12161C] border border-[#00D4FF]/20 shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden">
+    <div
+      style={{
+        opacity: Math.max(0.4, scrollIntensity),
+        transform: `perspective(1000px) rotateX(${(1 - scrollIntensity) * 4}deg) scale(${0.96 + 0.04 * scrollIntensity}) translateZ(${(1 - scrollIntensity) * -40}px)`,
+        transition: 'transform 0.15s ease-out, opacity 0.15s ease-out'
+      }}
+      className="flex flex-col w-full rounded-xl bg-[#12161C] border border-[#00D4FF]/15 shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden"
+    >
       {/* Window Chrome with authentic Mac traffic lights */}
       <WindowChrome
         title={currentSnippet.filename}

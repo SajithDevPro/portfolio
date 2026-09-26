@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
 import { SKILL_MODULES } from '../../data/portfolioData';
 import { WindowChrome } from '../common/WindowChrome';
 import { ActiveNode } from '../../types';
@@ -9,22 +10,48 @@ interface SkillsSectionProps {
 
 export const SkillsSection: React.FC<SkillsSectionProps> = ({ onNavigate }) => {
   const [activeModuleId, setActiveModuleId] = useState<string>('skill-robotics');
+  const sectionRef = useRef<HTMLElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  // Scroll-linked physical tile depth transforms (Requirement 1)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
+
+  const rawScale = useTransform(scrollYProgress, [0, 0.22, 0.78, 1], [0.93, 1, 1, 0.96]);
+  const rawY = useTransform(scrollYProgress, [0, 0.22, 0.78, 1], [40, 0, 0, -25]);
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.22, 0.78, 1], [3, 0, 0, -2]);
+  const rawOpacity = useTransform(scrollYProgress, [0, 0.16, 0.84, 1], [0.35, 1, 1, 0.45]);
+
+  const scale = shouldReduceMotion ? 1 : rawScale;
+  const y = shouldReduceMotion ? 0 : rawY;
+  const rotateX = shouldReduceMotion ? 0 : rawRotateX;
+  const opacity = rawOpacity;
 
   return (
-    <section
+    <motion.section
+      ref={sectionRef}
       id="skills"
       aria-label="Skills & Architectures"
+      style={{
+        scale,
+        y,
+        rotateX,
+        opacity,
+        transformPerspective: 1200,
+      }}
       className="relative w-full py-8 sm:py-14 flex flex-col gap-8"
     >
       {/* Node Marker Header */}
-      <div className="flex items-center justify-between px-3.5 py-1.5 rounded-full bg-[#12161C]/80 border border-[#00D4FF]/20 backdrop-blur-md max-w-lg">
+      <div className="flex items-center justify-between px-3.5 py-1.5 rounded-full bg-[#12161C]/80 border border-[#7B61FF]/20 backdrop-blur-md max-w-lg">
         <div className="flex items-center gap-2 min-w-0">
           <span className="w-2 h-2 rounded-full bg-[#7B61FF] animate-pulse" />
           <span className="font-code text-xs text-[#7B61FF] uppercase tracking-wider truncate">
             02 // SKILLS &amp; ARCHITECTURES
           </span>
         </div>
-        <span className="px-2 py-0.5 rounded bg-[#182028] text-[#00D4FF] font-code text-[11px] font-medium shrink-0">
+        <span className="px-2 py-0.5 rounded bg-[#182028] text-[#5B6B75] font-code text-[11px] font-medium shrink-0 border border-[#182028]">
           3 Core Areas
         </span>
       </div>
@@ -50,8 +77,8 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ onNavigate }) => {
               onClick={() => setActiveModuleId(module.id)}
               className={`group relative rounded-2xl bg-[#12161C] border transition-all duration-300 flex flex-col overflow-hidden cursor-pointer shadow-lg ${
                 isSelected
-                  ? 'border-[#00D4FF] shadow-[0_0_30px_rgba(0,212,255,0.2)] transform -translate-y-1.5'
-                  : 'border-[#00D4FF]/15 hover:border-[#00D4FF]/40 hover:-translate-y-1'
+                  ? 'border-[#00D4FF]/80 shadow-[0_0_24px_rgba(0,212,255,0.18)] transform -translate-y-1.5'
+                  : 'border-[#182028] hover:border-[#00D4FF]/35 hover:-translate-y-1'
               }`}
             >
               {/* Window Chrome with macOS traffic lights */}
@@ -74,16 +101,16 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ onNavigate }) => {
                     <span className="font-code text-[11px] text-[#7B61FF] uppercase tracking-wider">
                       {module.subtitle}
                     </span>
-                    <h3 className="font-display text-lg sm:text-xl font-bold text-[#EAF2F5] mt-1">
+                    <h3 className="font-display text-lg sm:text-xl font-bold text-[#EAF2F5] mt-1 group-hover:text-[#00D4FF] transition-colors">
                       {module.title}
                     </h3>
                   </div>
 
-                  {/* Animated Module Icon */}
+                  {/* Animated Module Icon (Muted slate by default, illuminated on hover/select) */}
                   <div
                     className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border transition-transform duration-300 ${
                       isSelected
-                        ? 'bg-[#00D4FF]/15 border-[#00D4FF] text-[#00D4FF] scale-110 shadow-[0_0_15px_rgba(0,212,255,0.4)]'
+                        ? 'bg-[#00D4FF]/10 border-[#00D4FF]/60 text-[#00D4FF] scale-110 shadow-[0_0_12px_rgba(0,212,255,0.3)]'
                         : 'bg-[#182028] border-[#182028] text-[#5B6B75] group-hover:text-[#00D4FF] group-hover:border-[#00D4FF]/30'
                     }`}
                   >
@@ -169,12 +196,12 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ onNavigate }) => {
       <div className="flex justify-center pt-2">
         <button
           onClick={() => onNavigate('projects')}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#182028] hover:bg-[#202934] border border-[#00D4FF]/30 hover:border-[#00D4FF] text-[#00D4FF] font-code text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer shadow-sm active:scale-95"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#182028] hover:bg-[#202934] border border-[#00D4FF]/25 hover:border-[#00D4FF] text-[#00D4FF] font-code text-xs font-semibold tracking-wider uppercase transition-all cursor-pointer shadow-sm active:scale-95"
         >
           <span>VIEW FEATURED PROJECTS</span>
           <span className="material-symbols-outlined text-sm">arrow_forward</span>
         </button>
       </div>
-    </section>
+    </motion.section>
   );
 };
