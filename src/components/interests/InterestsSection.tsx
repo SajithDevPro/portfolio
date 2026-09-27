@@ -69,35 +69,35 @@ export const InterestsSection: React.FC<InterestsSectionProps> = ({ onNavigate }
         {INTERESTS.map((item) => (
           <div
             key={item.id}
-            className="group relative rounded-2xl bg-[#12161C] border border-[#182028] hover:border-[#7B61FF]/40 transition-all duration-300 p-5 flex flex-col gap-4 overflow-hidden shadow-md hover:shadow-[0_8px_30px_rgba(123,97,255,0.12)] hover:-translate-y-1"
+            className="group relative rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--accent-violet)]/45 transition-all duration-300 p-5 flex flex-col gap-4 overflow-hidden shadow-md hover:shadow-[0_8px_30px_rgba(0,0,0,0.25)] hover:-translate-y-1"
           >
             {/* Ambient Radial Accent on Hover */}
-            <div className="absolute -top-12 -right-12 w-28 h-28 bg-[#7B61FF]/10 rounded-full blur-2xl group-hover:bg-[#7B61FF]/20 transition-all pointer-events-none" />
+            <div className="absolute -top-12 -right-12 w-28 h-28 bg-[var(--accent-violet)]/10 rounded-full blur-2xl group-hover:bg-[var(--accent-violet)]/20 transition-all pointer-events-none" />
 
             {/* Header Icon + Tag */}
             <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-[#182028] border border-[#182028] text-[#5B6B75] group-hover:text-[#7B61FF] group-hover:border-[#7B61FF]/40 flex items-center justify-center transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-muted)] group-hover:text-[var(--accent-violet)] group-hover:border-[var(--accent-violet)]/40 flex items-center justify-center transition-colors">
                 <span className="material-symbols-outlined text-[20px]">
                   {item.icon}
                 </span>
               </div>
-              <span className="font-code text-[10px] text-[#5B6B75] uppercase tracking-wider">
+              <span className="font-code text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
                 {item.tag}
               </span>
             </div>
 
             {/* Title & Short Phrase */}
             <div className="flex flex-col gap-1">
-              <h3 className="font-display text-base font-bold text-[#EAF2F5] group-hover:text-[#00D4FF] transition-colors">
+              <h3 className="font-display text-base font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-cyan)] transition-colors">
                 {item.title}
               </h3>
-              <span className="font-code text-xs text-[#00D4FF]/80">
+              <span className="font-code text-xs text-[var(--accent-cyan)]/85">
                 {item.phrase}
               </span>
             </div>
 
             {/* Description */}
-            <p className="font-body text-xs text-[#5B6B75] leading-relaxed mt-auto pt-1">
+            <p className="font-body text-xs text-[var(--text-secondary)] leading-relaxed mt-auto pt-1">
               {item.description}
             </p>
           </div>

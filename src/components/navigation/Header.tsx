@@ -1,6 +1,7 @@
 import React from 'react';
 import { EMBLEM_IMAGE, PROFILE_IMAGE } from '../../data/portfolioData';
 import { ActiveNode } from '../../types';
+import { ThemeSwitcher } from '../common/ThemeSwitcher';
 
 interface HeaderProps {
   activeNode: ActiveNode;
@@ -34,7 +35,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="fixed top-0 inset-x-0 z-40 bg-[#0A0E12]/85 backdrop-blur-xl border-b border-[#00D4FF]/15 transition-all">
+    <header className="fixed top-0 inset-x-0 z-40 bg-[var(--bg-page)]/85 backdrop-blur-xl border-b border-[var(--border-subtle)] transition-all">
       <div className="max-w-7xl mx-auto h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
         {/* Zone 1: Clear Human Identity & Genesis Brand */}
         <div className="flex items-center gap-3 shrink-0">
@@ -42,7 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onNavigate('hero')}
             className="flex items-center gap-2.5 text-left group cursor-pointer"
           >
-            <div className="relative w-8 h-8 flex items-center justify-center rounded-lg bg-[#12161C] border border-[#00D4FF]/30 p-1 group-hover:border-[#00D4FF] transition-colors">
+            <div className="relative w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--bg-surface)] border border-[var(--border-strong)] p-1 group-hover:border-[var(--accent-cyan)] transition-colors shadow-sm">
               <img
                 src={EMBLEM_IMAGE}
                 alt="Genesis Emblem"
@@ -51,50 +52,50 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="font-display font-bold text-sm tracking-wider text-[#EAF2F5] group-hover:text-[#00D4FF] transition-colors">
-                  ELARA VANCE
+                <span className="font-display font-bold text-sm tracking-tight text-[var(--text-primary)] group-hover:text-[var(--accent-cyan)] transition-colors">
+                  Elara Vance
                 </span>
-                <span className="px-1.5 py-0.2 rounded text-[10px] font-code bg-[#12161C] text-[#00D4FF] border border-[#00D4FF]/25">
-                  GENESIS
+                <span className="px-1.5 py-0.2 rounded text-[10px] font-code bg-[var(--bg-surface-elevated)] text-[var(--accent-cyan)] border border-[var(--border-subtle)]">
+                  Genesis
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 text-[10px] font-code text-[#5B6B75]">
+              <div className="flex items-center gap-1.5 text-[11px] font-body text-[var(--text-secondary)]">
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping-subtle absolute inline-flex h-full w-full rounded-full bg-[#00D4FF] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#00D4FF]"></span>
+                  <span className="animate-ping-subtle absolute inline-flex h-full w-full rounded-full bg-[var(--accent-cyan)] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[var(--accent-cyan)]"></span>
                 </span>
-                <span>Robotics &amp; AI Engineer</span>
+                <span>Robotics &amp; AI Systems Engineer</span>
               </div>
             </div>
           </button>
         </div>
 
-        {/* Zone 2: Trace Navigation Links (Desktop) - Self-Explanatory (Requirement 4) */}
+        {/* Zone 2: Trace Navigation Links (Desktop) - User-Friendly Title Case */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           {(['hero', 'about', 'skills', 'projects', 'interests', 'contact'] as ActiveNode[]).map((node) => {
             const isActive = activeNode === node;
             const labels: Record<ActiveNode, string> = {
-              hero: 'HOME',
-              about: 'PROFILE',
-              skills: 'SKILLS',
-              projects: 'PROJECTS',
-              interests: 'RESEARCH',
-              contact: 'CONTACT'
+              hero: 'Home',
+              about: 'Profile',
+              skills: 'Skills',
+              projects: 'Projects',
+              interests: 'Research',
+              contact: 'Contact'
             };
             return (
               <button
                 key={node}
                 onClick={() => onNavigate(node)}
                 title={nodeDescriptions[node]}
-                className={`transition-colors text-xs font-code tracking-wider uppercase relative py-1 cursor-pointer ${
+                className={`transition-colors text-xs sm:text-sm font-body font-medium relative py-1 cursor-pointer ${
                   isActive
-                    ? 'text-[#00D4FF] font-semibold drop-shadow-[0_0_8px_rgba(0,212,255,0.7)]'
-                    : 'text-[#5B6B75] hover:text-[#EAF2F5]'
+                    ? 'text-[var(--accent-cyan)] font-semibold'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 {labels[node]}
                 {isActive && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#00D4FF] to-[#7B61FF] rounded-full" />
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[var(--accent-cyan)] to-[var(--accent-violet)] rounded-full shadow-[0_0_8px_var(--accent-cyan)]" />
                 )}
               </button>
             );
@@ -102,25 +103,19 @@ export const Header: React.FC<HeaderProps> = ({
         </nav>
 
         {/* Zone 3: Active Section Indicator & Actions */}
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="hidden sm:flex flex-col items-end pr-1 text-right">
-            <span className="font-code text-[10px] text-[#5B6B75] uppercase tracking-wider">
-              CURRENT SECTION
-            </span>
-            <span className="font-code text-xs text-[#00D4FF] font-semibold">
-              {nodeDisplayNames[activeNode]}
-            </span>
-          </div>
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* User-Friendly Theme Switcher */}
+          <ThemeSwitcher />
 
-          {/* Gemini AI Co-Pilot Button */}
+          {/* Gemini AI Assistant Button */}
           {onOpenChat && (
             <button
               onClick={onOpenChat}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00D4FF]/10 hover:bg-[#00D4FF]/20 text-[#00D4FF] border border-[#00D4FF]/40 font-code text-xs font-medium transition-all active:scale-95 shadow-[0_0_12px_rgba(0,212,255,0.25)] cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--accent-cyan)]/10 hover:bg-[var(--accent-cyan)]/20 text-[var(--accent-cyan)] border border-[var(--accent-cyan)]/35 font-body text-xs font-semibold transition-all active:scale-95 shadow-sm cursor-pointer"
               title="Chat with an AI trained on Elara's background and engineering projects"
             >
               <span className="material-symbols-outlined text-sm animate-pulse">voice_chat</span>
-              <span className="hidden xs:inline">ASK AI ASSISTANT</span>
+              <span className="hidden xs:inline">Ask AI</span>
             </button>
           )}
 
@@ -128,18 +123,18 @@ export const Header: React.FC<HeaderProps> = ({
           {onOpenResume && (
             <button
               onClick={onOpenResume}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#182028] hover:bg-[#202934] text-[#EAF2F5] border border-[#00D4FF]/25 font-code text-xs font-medium transition-all active:scale-95 cursor-pointer"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-elevated)] text-[var(--text-primary)] border border-[var(--border-subtle)] font-body text-xs font-medium transition-all active:scale-95 cursor-pointer shadow-sm"
               title="View full resume spec sheet"
             >
-              <span className="material-symbols-outlined text-sm text-[#00D4FF]">description</span>
-              <span>RESUME / CV</span>
+              <span className="material-symbols-outlined text-sm text-[var(--accent-cyan)]">description</span>
+              <span>Resume</span>
             </button>
           )}
 
           {/* Profile mini avatar */}
           <button
             onClick={() => onNavigate('about')}
-            className="relative flex items-center justify-center p-0.5 rounded-full bg-[#182028] border border-[#00D4FF]/40 shadow-[0_0_10px_rgba(0,212,255,0.3)] hover:border-[#00D4FF] transition-all cursor-pointer"
+            className="relative flex items-center justify-center p-0.5 rounded-full bg-[var(--bg-surface)] border border-[var(--accent-cyan)]/40 shadow-sm hover:border-[var(--accent-cyan)] transition-all cursor-pointer"
             title="View Engineer Profile"
           >
             <img
@@ -147,7 +142,7 @@ export const Header: React.FC<HeaderProps> = ({
               alt="Elara Vance"
               className="w-7 h-7 rounded-full object-cover"
             />
-            <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-[#00D4FF] rounded-full ring-2 ring-[#0A0E12]" />
+            <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-[var(--accent-cyan)] rounded-full ring-2 ring-[var(--bg-page)]" />
           </button>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ActiveNode } from '../../types';
+import { useTheme } from '../../context/ThemeContext';
 
 interface FloatingDockProps {
   onNavigate: (node: ActiveNode) => void;
@@ -9,20 +10,57 @@ interface FloatingDockProps {
 
 export const FloatingDock: React.FC<FloatingDockProps> = ({
   onNavigate,
-  onOpenTerminalModal,
+  onOpenTerminalModal: _onOpenTerminalModal,
   onOpenChatModal,
 }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const { theme, fontStyle, toggleTheme, toggleFont } = useTheme();
+
+  const themeNames: Record<string, { label: string; short: string; icon: string }> = {
+    studio: { label: 'Studio Slate', short: 'Slate', icon: 'palette' },
+    light: { label: 'Daylight Paper', short: 'Daylight', icon: 'light_mode' },
+    amber: { label: 'Warm Amber', short: 'Amber', icon: 'wb_sunny' },
+    forest: { label: 'Nordic Emerald', short: 'Emerald', icon: 'forest' },
+    midnight: { label: 'Midnight Obsidian', short: 'Midnight', icon: 'dark_mode' },
+  };
+
+  const currentThemeInfo = themeNames[theme] || themeNames.studio;
+
+  const fontNames: Record<string, { label: string; short: string }> = {
+    friendly: { label: 'Friendly Font (Outfit)', short: 'Friendly' },
+    modern: { label: 'Modern Font (Jakarta)', short: 'Modern' },
+    reading: { label: 'Reading Font (DM Sans)', short: 'Reading' },
+  };
+
+  const currentFontInfo = fontNames[fontStyle] || fontNames.friendly;
 
   const dockItems = [
     {
       id: 'ai_chat',
-      label: 'AI Chatbot (Trained on my work)',
+      label: 'AI Assistant (Ask about my work)',
       shortLabel: 'AI Chat',
       icon: 'voice_chat',
       action: onOpenChatModal,
       isExternal: false,
       isSpecial: true,
+    },
+    {
+      id: 'theme_toggle',
+      label: `Switch Theme (Active: ${currentThemeInfo.label})`,
+      shortLabel: currentThemeInfo.short,
+      icon: currentThemeInfo.icon,
+      action: toggleTheme,
+      isExternal: false,
+      isTheme: true,
+    },
+    {
+      id: 'font_toggle',
+      label: `Switch Font Style (Active: ${currentFontInfo.label})`,
+      shortLabel: currentFontInfo.short,
+      icon: 'font_download',
+      action: toggleFont,
+      isExternal: false,
+      isFont: true,
     },
     {
       id: 'github',
@@ -55,7 +93,7 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({
     <footer className="fixed bottom-3 inset-x-0 z-40 flex justify-center px-4 pointer-events-none pb-safe">
       <nav
         aria-label="Quick Access Dock"
-        className="pointer-events-auto flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 bg-[#0B0F13]/90 backdrop-blur-2xl rounded-full border border-[#00D4FF]/25 shadow-[0_8px_32px_rgba(0,0,0,0.7)] shadow-[0_0_20px_rgba(0,212,255,0.12)] transition-all duration-300"
+        className="pointer-events-auto flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 bg-[var(--bg-surface)]/90 backdrop-blur-2xl rounded-full border border-[var(--border-subtle)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-300"
       >
         {dockItems.map((item, idx) => {
           const isHovered = hoveredIndex === idx;
@@ -64,22 +102,26 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({
             <div
               className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-200 cursor-pointer min-h-[38px] ${
                 item.accent
-                  ? 'text-[#7B61FF] bg-[#7B61FF]/15 hover:bg-[#7B61FF]/25 border border-[#7B61FF]/40 shadow-[0_0_12px_rgba(123,97,255,0.25)]'
+                  ? 'text-[var(--accent-violet)] bg-[var(--accent-violet)]/15 hover:bg-[var(--accent-violet)]/25 border border-[var(--accent-violet)]/40 shadow-sm'
                   : item.isSpecial
-                  ? 'text-[#00D4FF] bg-[#00D4FF]/15 hover:bg-[#00D4FF]/25 border border-[#00D4FF]/50 shadow-[0_0_14px_rgba(0,212,255,0.35)]'
-                  : 'text-[#EAF2F5]/85 hover:text-[#00D4FF] hover:bg-[#12161C] border border-[#182028] hover:border-[#00D4FF]/30'
+                  ? 'text-[var(--accent-cyan)] bg-[var(--accent-cyan)]/15 hover:bg-[var(--accent-cyan)]/25 border border-[var(--accent-cyan)]/50 shadow-sm'
+                  : item.isTheme
+                  ? 'text-[var(--accent-amber)] bg-[var(--accent-amber)]/12 hover:bg-[var(--accent-amber)]/22 border border-[var(--accent-amber)]/35 shadow-sm'
+                  : item.isFont
+                  ? 'text-[var(--accent-cyan)] bg-[var(--accent-cyan)]/10 hover:bg-[var(--accent-cyan)]/20 border border-[var(--accent-cyan)]/30 shadow-sm'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)]'
               }`}
             >
               <span className="material-symbols-outlined text-[17px]">
                 {item.icon}
               </span>
-              <span className="font-code text-xs font-medium tracking-wide">
+              <span className="font-body text-xs font-semibold tracking-normal">
                 {item.shortLabel}
               </span>
 
               {/* Tooltip on Hover / Focus */}
               {isHovered && (
-                <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded bg-[#12161C] border border-[#00D4FF]/40 text-[#EAF2F5] font-code text-[10px] whitespace-nowrap shadow-lg pointer-events-none z-50">
+                <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg bg-[var(--bg-surface-elevated)] border border-[var(--border-strong)] text-[var(--text-primary)] font-body text-[11px] font-medium whitespace-nowrap shadow-lg pointer-events-none z-50">
                   {item.label}
                 </div>
               )}
@@ -110,7 +152,7 @@ export const FloatingDock: React.FC<FloatingDockProps> = ({
               onMouseEnter={() => setHoveredIndex(idx)}
               onMouseLeave={() => setHoveredIndex(null)}
               aria-label={item.label}
-              className="transition-transform duration-150 inline-block focus:outline-none hover:scale-105 active:scale-95"
+              className="transition-transform duration-150 inline-block focus:outline-none hover:scale-105 active:scale-95 cursor-pointer"
             >
               {content}
             </button>

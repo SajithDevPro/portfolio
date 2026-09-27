@@ -190,16 +190,16 @@ export const ContactSection: React.FC = () => {
                       placeholder="e.g. Dr. Jennifer Chen"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3 rounded-lg bg-[#12161C] border border-[#182028] focus:border-[#00D4FF]/60 text-[#EAF2F5] font-code text-xs sm:text-sm focus:outline-none transition-colors shadow-inner"
+                      className="w-full px-4 py-3 rounded-lg bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] focus:border-[var(--accent-cyan)] text-[var(--text-primary)] placeholder-[var(--text-muted)] font-body text-xs sm:text-sm focus:outline-none transition-colors shadow-sm"
                     />
                   </div>
                 </div>
 
                 {/* Email Field */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-code text-xs text-[#5B6B75] flex items-center gap-2">
-                    <span className="text-[#00D4FF]">02.</span>
-                    <span className="uppercase tracking-wider">EMAIL ADDRESS</span>
+                  <label className="font-code text-xs text-[var(--text-muted)] flex items-center gap-2">
+                    <span className="text-[var(--accent-cyan)]">02.</span>
+                    <span className="uppercase tracking-wider font-semibold">EMAIL ADDRESS</span>
                   </label>
                   <input
                     type="email"
@@ -207,20 +207,20 @@ export const ContactSection: React.FC = () => {
                     placeholder="j.chen@lab.institution.edu"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-[#12161C] border border-[#182028] focus:border-[#00D4FF]/60 text-[#EAF2F5] font-code text-xs sm:text-sm focus:outline-none transition-colors shadow-inner"
+                    className="w-full px-4 py-3 rounded-lg bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] focus:border-[var(--accent-cyan)] text-[var(--text-primary)] placeholder-[var(--text-muted)] font-body text-xs sm:text-sm focus:outline-none transition-colors shadow-sm"
                   />
                 </div>
 
                 {/* Subsystem Intent Selector */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-code text-xs text-[#5B6B75] flex items-center gap-2">
-                    <span className="text-[#00D4FF]">03.</span>
-                    <span className="uppercase tracking-wider">SUBJECT / TOPIC</span>
+                  <label className="font-code text-xs text-[var(--text-muted)] flex items-center gap-2">
+                    <span className="text-[var(--accent-cyan)]">03.</span>
+                    <span className="uppercase tracking-wider font-semibold">SUBJECT / TOPIC</span>
                   </label>
                   <select
                     value={formData.subsystem}
                     onChange={(e) => setFormData({ ...formData, subsystem: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-[#12161C] border border-[#182028] focus:border-[#00D4FF]/60 text-[#EAF2F5] font-code text-xs sm:text-sm focus:outline-none transition-colors cursor-pointer"
+                    className="w-full px-4 py-3 rounded-lg bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] focus:border-[var(--accent-cyan)] text-[var(--text-primary)] font-body text-xs sm:text-sm focus:outline-none transition-colors cursor-pointer shadow-sm"
                   >
                     <option value="ROBOTICS_COLLABORATION">Robotics &amp; Embodied AI Collaboration</option>
                     <option value="FULLTIME_RECRUITMENT">Full-Time Engineering Recruitment</option>
@@ -231,9 +231,9 @@ export const ContactSection: React.FC = () => {
 
                 {/* Message Field */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-code text-xs text-[#5B6B75] flex items-center gap-2">
-                    <span className="text-[#00D4FF]">04.</span>
-                    <span className="uppercase tracking-wider">YOUR MESSAGE</span>
+                  <label className="font-code text-xs text-[var(--text-muted)] flex items-center gap-2">
+                    <span className="text-[var(--accent-cyan)]">04.</span>
+                    <span className="uppercase tracking-wider font-semibold">YOUR MESSAGE</span>
                   </label>
                   <textarea
                     required
@@ -241,7 +241,7 @@ export const ContactSection: React.FC = () => {
                     placeholder="Outline project parameters, hardware constraints, or role specifications..."
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-[#12161C] border border-[#182028] focus:border-[#00D4FF]/60 text-[#EAF2F5] font-code text-xs sm:text-sm focus:outline-none transition-colors shadow-inner resize-none"
+                    className="w-full px-4 py-3 rounded-lg bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] focus:border-[var(--accent-cyan)] text-[var(--text-primary)] placeholder-[var(--text-muted)] font-body text-xs sm:text-sm focus:outline-none transition-colors shadow-sm resize-none"
                   />
                 </div>
 

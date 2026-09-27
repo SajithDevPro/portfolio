@@ -1,60 +1,200 @@
 @import "tailwindcss";
 
 @layer base {
-  :root {
-    --bg-void: #0A0E12;
-    --panel-graphite: #12161C;
+  /* ========================================================
+     1. TYPOGRAPHY SCALES & FONT FAMILIES (USER-FRIENDLY)
+     ======================================================== */
+  :root,
+  [data-font="friendly"] {
+    --font-family-display: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-family-body: 'Outfit', 'Plus Jakarta Sans', 'DM Sans', system-ui, -apple-system, sans-serif;
+    --font-family-code: 'JetBrains Mono', monospace;
+  }
+
+  [data-font="modern"] {
+    --font-family-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-family-body: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    --font-family-code: 'JetBrains Mono', monospace;
+  }
+
+  [data-font="reading"] {
+    --font-family-display: 'DM Sans', system-ui, -apple-system, sans-serif;
+    --font-family-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+    --font-family-code: 'JetBrains Mono', monospace;
+  }
+
+  /* ========================================================
+     2. THEME COLOR SCHEMES
+     ======================================================== */
+
+  /* Theme 1: Studio Slate (Warm Ergonomic Dark - Recommended) */
+  :root,
+  [data-theme="studio"] {
+    --bg-page: #0C1017;
+    --bg-surface: #131A26;
+    --bg-surface-elevated: #1B2433;
+    --bg-surface-subtle: #0F1622;
+    --border-subtle: rgba(56, 189, 248, 0.16);
+    --border-strong: rgba(56, 189, 248, 0.35);
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --accent-cyan: #38BDF8;
+    --accent-violet: #818CF8;
+    --accent-amber: #FBBF24;
+
+    /* Legacy compatibility tokens */
+    --bg-void: #0C1017;
+    --panel-graphite: #131A26;
+    --signal-cyan: #38BDF8;
+    --circuit-violet: #818CF8;
+    --ember-amber: #FBBF24;
+    --near-white: #F8FAFC;
+    --muted-slate: #94A3B8;
+  }
+
+  /* Theme 2: Daylight Paper (Warm Cream Light Mode - Highly Readable) */
+  [data-theme="light"] {
+    --bg-page: #F8FAFC;
+    --bg-surface: #FFFFFF;
+    --bg-surface-elevated: #F1F5F9;
+    --bg-surface-subtle: #F8FAFC;
+    --border-subtle: rgba(15, 23, 42, 0.1);
+    --border-strong: rgba(2, 132, 199, 0.35);
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+    --accent-cyan: #0284C7;
+    --accent-violet: #6366F1;
+    --accent-amber: #D97706;
+
+    --bg-void: #F8FAFC;
+    --panel-graphite: #FFFFFF;
+    --signal-cyan: #0284C7;
+    --circuit-violet: #6366F1;
+    --ember-amber: #D97706;
+    --near-white: #0F172A;
+    --muted-slate: #475569;
+  }
+
+  /* Theme 3: Warm Amber & Sand (Cozy Warm Dark - Comforting) */
+  [data-theme="amber"] {
+    --bg-page: #151310;
+    --bg-surface: #1E1A16;
+    --bg-surface-elevated: #28221D;
+    --bg-surface-subtle: #191613;
+    --border-subtle: rgba(245, 158, 11, 0.18);
+    --border-strong: rgba(245, 158, 11, 0.4);
+    --text-primary: #FFFBEB;
+    --text-secondary: #D5C7B7;
+    --text-muted: #9E8E7C;
+    --accent-cyan: #F59E0B;
+    --accent-violet: #FB7185;
+    --accent-amber: #FBBF24;
+
+    --bg-void: #151310;
+    --panel-graphite: #1E1A16;
+    --signal-cyan: #F59E0B;
+    --circuit-violet: #FB7185;
+    --ember-amber: #FBBF24;
+    --near-white: #FFFBEB;
+    --muted-slate: #D5C7B7;
+  }
+
+  /* Theme 4: Nordic Emerald (Calm Mint & Forest) */
+  [data-theme="forest"] {
+    --bg-page: #0B1412;
+    --bg-surface: #101F1B;
+    --bg-surface-elevated: #162B26;
+    --bg-surface-subtle: #0D1815;
+    --border-subtle: rgba(16, 185, 129, 0.18);
+    --border-strong: rgba(16, 185, 129, 0.4);
+    --text-primary: #F0FDF4;
+    --text-secondary: #99B8AC;
+    --text-muted: #648778;
+    --accent-cyan: #10B981;
+    --accent-violet: #06B6D4;
+    --accent-amber: #FBBF24;
+
+    --bg-void: #0B1412;
+    --panel-graphite: #101F1B;
+    --signal-cyan: #10B981;
+    --circuit-violet: #06B6D4;
+    --ember-amber: #FBBF24;
+    --near-white: #F0FDF4;
+    --muted-slate: #99B8AC;
+  }
+
+  /* Theme 5: Midnight Obsidian (Deep Cosmic Dark) */
+  [data-theme="midnight"] {
+    --bg-page: #06090F;
+    --bg-surface: #0C111A;
+    --bg-surface-elevated: #131B29;
+    --bg-surface-subtle: #080C14;
+    --border-subtle: rgba(0, 212, 255, 0.18);
+    --border-strong: rgba(0, 212, 255, 0.45);
+    --text-primary: #FFFFFF;
+    --text-secondary: #94A3B8;
+    --text-muted: #475569;
+    --accent-cyan: #00D4FF;
+    --accent-violet: #7B61FF;
+    --accent-amber: #FF9F45;
+
+    --bg-void: #06090F;
+    --panel-graphite: #0C111A;
     --signal-cyan: #00D4FF;
     --circuit-violet: #7B61FF;
     --ember-amber: #FF9F45;
-    --near-white: #EAF2F5;
-    --muted-slate: #5B6B75;
+    --near-white: #FFFFFF;
+    --muted-slate: #94A3B8;
   }
 
   html {
     scroll-behavior: smooth;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background-color: #0A0E12;
-    color: #EAF2F5;
+    font-family: var(--font-family-body, 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif);
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
   }
 
-  /* Custom subtle scrollbar */
+  /* Custom ergonomic scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #0A0E12;
+    background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #1e2630;
-    border-radius: 3px;
+    background: rgba(148, 163, 184, 0.25);
+    border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #00D4FF;
+    background: var(--accent-cyan);
   }
 }
 
 .font-display {
-  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-family: var(--font-family-display, 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif);
+  letter-spacing: -0.02em;
 }
 
 .font-body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-family-body, 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif);
 }
 
 .font-code {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-family-code, 'JetBrains Mono', monospace);
 }
 
 @keyframes pulse-trace {
   0%, 100% {
     opacity: 0.35;
-    box-shadow: 0 0 4px #00D4FF;
+    box-shadow: 0 0 4px var(--accent-cyan);
   }
   50% {
     opacity: 1;
-    box-shadow: 0 0 14px #00D4FF, 0 0 24px rgba(0, 212, 255, 0.4);
+    box-shadow: 0 0 14px var(--accent-cyan), 0 0 24px rgba(56, 189, 248, 0.35);
   }
 }
 
@@ -88,18 +228,18 @@
 
 /* Glass panel utility */
 .glass-panel {
-  background: rgba(18, 22, 28, 0.75);
+  background: var(--bg-surface);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 212, 255, 0.14);
+  border: 1px solid var(--border-subtle);
 }
 
 .glass-panel-elevated {
-  background: rgba(24, 30, 38, 0.85);
+  background: var(--bg-surface-elevated);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 212, 255, 0.24);
-  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.6), 0 0 20px -5px rgba(0, 212, 255, 0.12);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.4), 0 0 20px -5px var(--border-subtle);
 }
 
 /* Hexagon clip path */
@@ -110,4 +250,3 @@
 .clip-circuit-corner {
   clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
 }
-

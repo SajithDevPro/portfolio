@@ -146,7 +146,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
 
             {/* Float Info Banner */}
             <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-2">
-              <span className="px-2.5 py-1 rounded bg-[#0A0E12]/90 text-[#00D4FF] border border-[#00D4FF]/30 font-code text-xs w-fit">
+              <span className="px-2.5 py-1 rounded-full bg-[var(--bg-surface)] text-[var(--accent-cyan)] border border-[var(--accent-cyan)]/35 font-code text-xs w-fit shadow-sm">
                 {selectedProject.categoryLabel}
               </span>
               <h1 className="font-display text-2xl sm:text-4xl font-bold text-[#EAF2F5]">
@@ -321,8 +321,8 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                 onClick={() => setFilter(item.id)}
                 className={`px-3 sm:px-4 py-1.5 rounded-lg font-code text-xs tracking-wider transition-all duration-200 cursor-pointer ${
                   isActive
-                    ? 'bg-[#00D4FF] text-[#0A0E12] font-bold shadow-[0_0_12px_rgba(0,212,255,0.4)]'
-                    : 'text-[#5B6B75] hover:text-[#EAF2F5]'
+                    ? 'bg-[var(--accent-cyan)] text-[var(--bg-page)] font-bold shadow-sm'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 {item.label}
@@ -338,7 +338,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
           <div
             key={project.id}
             onClick={() => setActiveSlug(project.slug)}
-            className="group relative rounded-2xl bg-[#12161C] border border-[#182028] hover:border-[#00D4FF]/40 transition-all duration-300 flex flex-col overflow-hidden shadow-lg hover:shadow-[0_12px_36px_rgba(0,212,255,0.12)] hover:-translate-y-1.5 cursor-pointer"
+            className="group relative rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--accent-cyan)]/45 transition-all duration-300 flex flex-col overflow-hidden shadow-lg hover:shadow-[0_12px_36px_rgba(0,0,0,0.25)] hover:-translate-y-1.5 cursor-pointer"
           >
             <WindowChrome
               title={`${project.slug}.md`}
@@ -348,7 +348,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
             />
 
             {/* Thumbnail with Responsive WebP & Lazy Loading */}
-            <div className="relative w-full h-48 sm:h-56 bg-[#0B0F13] overflow-hidden">
+            <div className="relative w-full h-48 sm:h-56 bg-[var(--bg-surface-subtle)] overflow-hidden">
               <picture>
                 {project.imageMobile && (
                   <source media="(max-width: 640px)" srcSet={project.imageMobile} type="image/webp" />
@@ -362,14 +362,14 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                 />
               </picture>
-              <div className="absolute inset-0 bg-gradient-to-t from-[#12161C] via-[#12161C]/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-surface)] via-[var(--bg-surface)]/30 to-transparent" />
 
               {/* Curiosity Gap One-Line Result Banner */}
               <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
-                <span className="px-2.5 py-1 rounded bg-[#0A0E12]/90 border border-[#00D4FF]/25 font-code text-[11px] text-[#00D4FF] font-medium backdrop-blur-md">
+                <span className="px-2.5 py-1 rounded-full bg-[var(--bg-surface)]/95 border border-[var(--accent-cyan)]/35 font-code text-[11px] text-[var(--accent-cyan)] font-medium backdrop-blur-md">
                   {project.outcome}
                 </span>
-                <span className="font-code text-[10px] text-[#EAF2F5] bg-[#182028]/90 px-2 py-0.5 rounded border border-[#182028] group-hover:border-[#00D4FF]/40 transition-colors">
+                <span className="font-code text-[10px] text-[var(--text-primary)] bg-[var(--bg-surface-elevated)]/90 px-2 py-0.5 rounded border border-[var(--border-subtle)] group-hover:border-[var(--accent-cyan)]/40 transition-colors">
                   DETAILS ›
                 </span>
               </div>

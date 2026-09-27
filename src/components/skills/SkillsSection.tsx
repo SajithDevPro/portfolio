@@ -44,24 +44,24 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ onNavigate }) => {
       className="relative w-full py-8 sm:py-14 flex flex-col gap-8"
     >
       {/* Node Marker Header */}
-      <div className="flex items-center justify-between px-3.5 py-1.5 rounded-full bg-[#12161C]/80 border border-[#7B61FF]/20 backdrop-blur-md max-w-lg">
+      <div className="flex items-center justify-between px-3.5 py-1.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] backdrop-blur-md max-w-lg">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="w-2 h-2 rounded-full bg-[#7B61FF] animate-pulse" />
-          <span className="font-code text-xs text-[#7B61FF] uppercase tracking-wider truncate">
-            02 // SKILLS &amp; ARCHITECTURES
+          <span className="w-2 h-2 rounded-full bg-[var(--accent-violet)] animate-pulse" />
+          <span className="font-body text-xs text-[var(--accent-violet)] font-semibold tracking-wide truncate">
+            02 · Skills &amp; Architectures
           </span>
         </div>
-        <span className="px-2 py-0.5 rounded bg-[#182028] text-[#5B6B75] font-code text-[11px] font-medium shrink-0 border border-[#182028]">
+        <span className="px-2.5 py-0.5 rounded-full bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] font-body text-[11px] font-medium shrink-0 border border-[var(--border-subtle)]">
           3 Core Areas
         </span>
       </div>
 
       {/* Section Title */}
       <div className="flex flex-col gap-2">
-        <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold uppercase tracking-tight text-[#EAF2F5]">
-          CORE SKILLS &amp; DOMAINS
+        <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[var(--text-primary)]">
+          Core Skills &amp; Domains
         </h2>
-        <p className="font-body text-sm sm:text-base text-[#5B6B75] max-w-2xl">
+        <p className="font-body text-sm sm:text-base text-[var(--text-secondary)] max-w-2xl leading-relaxed">
           Hardware-software co-design modules docked directly to physical platforms and edge infrastructure.
         </p>
       </div>
@@ -75,10 +75,10 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ onNavigate }) => {
             <div
               key={module.id}
               onClick={() => setActiveModuleId(module.id)}
-              className={`group relative rounded-2xl bg-[#12161C] border transition-all duration-300 flex flex-col overflow-hidden cursor-pointer shadow-lg ${
+              className={`group relative rounded-2xl bg-[var(--bg-surface)] border transition-all duration-300 flex flex-col overflow-hidden cursor-pointer shadow-lg ${
                 isSelected
-                  ? 'border-[#00D4FF]/80 shadow-[0_0_24px_rgba(0,212,255,0.18)] transform -translate-y-1.5'
-                  : 'border-[#182028] hover:border-[#00D4FF]/35 hover:-translate-y-1'
+                  ? 'border-[var(--accent-cyan)] shadow-md transform -translate-y-1.5'
+                  : 'border-[var(--border-subtle)] hover:border-[var(--accent-cyan)]/45 hover:-translate-y-1'
               }`}
             >
               {/* Window Chrome with macOS traffic lights */}
@@ -98,20 +98,20 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ onNavigate }) => {
                 {/* Header with animated custom vector icon */}
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex flex-col">
-                    <span className="font-code text-[11px] text-[#7B61FF] uppercase tracking-wider">
+                    <span className="font-code text-[11px] text-[var(--accent-violet)] uppercase tracking-wider font-semibold">
                       {module.subtitle}
                     </span>
-                    <h3 className="font-display text-lg sm:text-xl font-bold text-[#EAF2F5] mt-1 group-hover:text-[#00D4FF] transition-colors">
+                    <h3 className="font-display text-lg sm:text-xl font-bold text-[var(--text-primary)] mt-1 group-hover:text-[var(--accent-cyan)] transition-colors">
                       {module.title}
                     </h3>
                   </div>
 
-                  {/* Animated Module Icon (Muted slate by default, illuminated on hover/select) */}
+                  {/* Animated Module Icon */}
                   <div
                     className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border transition-transform duration-300 ${
                       isSelected
-                        ? 'bg-[#00D4FF]/10 border-[#00D4FF]/60 text-[#00D4FF] scale-110 shadow-[0_0_12px_rgba(0,212,255,0.3)]'
-                        : 'bg-[#182028] border-[#182028] text-[#5B6B75] group-hover:text-[#00D4FF] group-hover:border-[#00D4FF]/30'
+                        ? 'bg-[var(--accent-cyan)]/15 border-[var(--accent-cyan)]/60 text-[var(--accent-cyan)] scale-110 shadow-sm'
+                        : 'bg-[var(--bg-surface-elevated)] border-[var(--border-subtle)] text-[var(--text-muted)] group-hover:text-[var(--accent-cyan)] group-hover:border-[var(--accent-cyan)]/40'
                     }`}
                   >
                     {module.iconType === 'servo' && (
@@ -142,19 +142,19 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ onNavigate }) => {
                 </div>
 
                 {/* Explanatory Body */}
-                <p className="font-body text-xs sm:text-sm text-[#EAF2F5]/80 leading-relaxed">
+                <p className="font-body text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
                   {module.description}
                 </p>
 
                 {/* Concrete Architectural Highlights */}
-                <div className="flex flex-col gap-2 pt-2 border-t border-[#182028]">
-                  <span className="font-code text-[10px] text-[#5B6B75] uppercase tracking-wider">
+                <div className="flex flex-col gap-2 pt-2 border-t border-[var(--border-subtle)]">
+                  <span className="font-code text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
                     VALIDATED EXPERTISE
                   </span>
-                  <ul className="flex flex-col gap-1.5 font-body text-xs text-[#EAF2F5]/75">
+                  <ul className="flex flex-col gap-1.5 font-body text-xs text-[var(--text-secondary)]">
                     {module.highlights.map((highlight, hIdx) => (
                       <li key={hIdx} className="flex items-start gap-2">
-                        <span className="text-[#00D4FF] font-code text-xs mt-0.5">›</span>
+                        <span className="text-[var(--accent-cyan)] font-code text-xs mt-0.5">›</span>
                         <span>{highlight}</span>
                       </li>
                     ))}
@@ -166,7 +166,7 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ onNavigate }) => {
                   {module.technologies.map((tech, tIdx) => (
                     <span
                       key={tIdx}
-                      className="px-2 py-0.5 rounded bg-[#0B0F13] text-[#EAF2F5]/80 border border-[#182028] font-code text-[11px]"
+                      className="px-2.5 py-0.5 rounded-md bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] border border-[var(--border-subtle)] font-code text-[11px]"
                     >
                       {tech}
                     </span>
@@ -174,14 +174,14 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ onNavigate }) => {
                 </div>
 
                 {/* Power / Signal Meter */}
-                <div className="mt-auto pt-3 border-t border-[#182028] flex flex-col gap-1.5">
+                <div className="mt-auto pt-3 border-t border-[var(--border-subtle)] flex flex-col gap-1.5">
                   <div className="flex items-center justify-between font-code text-[11px]">
-                    <span className="text-[#5B6B75]">POWER_INDEX: {module.signalPower}</span>
-                    <span className="text-[#00D4FF] font-semibold">{module.competencyLevel}%</span>
+                    <span className="text-[var(--text-muted)]">POWER_INDEX: {module.signalPower}</span>
+                    <span className="text-[var(--accent-cyan)] font-semibold">{module.competencyLevel}%</span>
                   </div>
-                  <div className="w-full h-1.5 bg-[#0B0F13] rounded-full overflow-hidden p-0.5 border border-[#182028]">
+                  <div className="w-full h-1.5 bg-[var(--bg-surface-subtle)] rounded-full overflow-hidden p-0.5 border border-[var(--border-subtle)]">
                     <div
-                      className="h-full bg-gradient-to-r from-[#00D4FF] via-[#7B61FF] to-[#00D4FF] rounded-full transition-all duration-700 ease-out"
+                      className="h-full bg-gradient-to-r from-[var(--accent-cyan)] via-[var(--accent-violet)] to-[var(--accent-cyan)] rounded-full transition-all duration-700 ease-out"
                       style={{ width: `${module.competencyLevel}%` }}
                     />
                   </div>
