@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
+import { PROJECTS, SKILL_MODULES, INTERESTS } from './src/data/portfolioData';
 
 dotenv.config();
 
@@ -30,40 +31,66 @@ interface ChatMessage {
   text: string;
 }
 
-const SYSTEM_ROLES: Record<string, string> = {
-  genesis_ai: `You are GENESIS AI, the autonomous cybernetic core and embodied intelligence co-pilot of Elara Vance's robotics engineering system (Genesis v4.2).
-You represent Elara Vance (Software Systems Engineer specializing in Autonomous Robotics, Machine Learning & Real-Time Edge Cloud Systems).
-Your personality is precise, technologically authoritative, sharp, and encouraging—reminiscent of an advanced telemetry assistant.
-You possess deep knowledge of:
-1. Adaptive Quadruped Kinematics: 1000 Hz RT-Preempt Linux control loop, 12-DOF planetary servos, ROS2 Humble, domain-randomized PyTorch locomotion policy trained in Isaac Gym, 0.04s rough terrain response.
-2. Edge Tensor Vision Transformer: INT8 quantization on NVIDIA Jetson AGX Orin, shifted-window sparse attention, 120.4 FPS, 99.4% precision under 14.2W power draw.
-3. Synapse K8s Fleet Mesh: eBPF fast-path routing with Cilium, sub-12ms peering latency across 500+ heterogeneous nodes, autonomous network partition recovery.
-4. Neuro-Haptic Exoskeleton: 6-DOF master arm, 2500 Hz sample rate, STM32H7, 0.2mm precision tactile force feedback.
-Format your responses using clean markdown, structured code snippets where relevant, and concise technical explanations. Keep the tone sophisticated, engineered, and helpful.`,
+// Free-tier valid models with primary and automatic fallback
+const PRIMARY_MODEL = 'gemini-3.8-flash';
+const FALLBACK_MODELS = ['gemini-3.1-flash-lite', 'gemini-flash-latest'];
 
-  robotics_engineer: `You are the Robotics & Kinematics Specialist for the Genesis engineering team.
-You focus strictly on mechanical actuation, dynamic balance, ROS2 node graph architecture, CAN/EtherCAT bus timing, inverse kinematics (DLS / Jacobian transpose), trajectory planning, and low-level embedded control (C++20, RT-Preempt).
-Provide rigorous, practical calculations, formulas, and deterministic control solutions.`,
+// Dynamically generate the system prompt from the single source of truth (portfolioData.ts)
+function generateSystemPrompt(): string {
+  const projectSummaries = PROJECTS.map((proj, idx) => `
+Project #${idx + 1}: ${proj.title} [Category: ${proj.categoryLabel}]
+- Tagline: ${proj.tagline}
+- Core Outcome: ${proj.outcome}
+- Engineering Problem: ${proj.problem}
+- Technical Approach: ${proj.approach}
+- Elara's Role: ${proj.role}
+- Quantitative Result: ${proj.result}
+- Tech Stack: ${proj.stack.join(', ')}
+- Engineering Specs: ${proj.specs.map((s) => `${s.label}: ${s.value}`).join(' | ')}
+- Repository: ${proj.githubUrl || 'Available on request'}
+`).join('\n');
 
-  ml_architect: `You are the Machine Learning & Edge Acceleration Architect for Genesis.
-You focus on deep learning model compression, Vision Transformers (ViTs), TensorRT graph optimization, CUDA kernel optimization, sparse attention mechanisms, and on-device deployment constraints on edge devices like NVIDIA Jetson and TPU accelerators.
-Provide detailed architectural guidance, quantization trade-offs, and inference latency profiling.`
-};
+  const skillsSummaries = SKILL_MODULES.map((skill) => `
+Skill Domain: ${skill.title} (${skill.subtitle})
+- Description: ${skill.description}
+- Technologies & Tools: ${skill.technologies.join(', ')}
+- Signal Benchmark: ${skill.signalPower}
+- Core Highlights:
+${skill.highlights.map((h) => `  * ${h}`).join('\n')}
+`).join('\n');
 
-// Model selection helper based on user request:
-// gemini-3.1-pro-preview for particularly complex tasks
-// gemini-3.5-flash for general tasks
-// gemini-3.1-flash-lite for tasks that should happen fast
-function resolveModel(mode?: string): string {
-  switch (mode) {
-    case 'complex':
-      return 'gemini-3.1-pro-preview';
-    case 'fast':
-      return 'gemini-3.1-flash-lite';
-    case 'general':
-    default:
-      return 'gemini-3.5-flash';
-  }
+  const interestsSummaries = INTERESTS.map((item) => `
+- ${item.title} [Tag: ${item.tag}]: ${item.phrase} — ${item.description}
+`).join('\n');
+
+  return `You are the AI Assistant for Elara Vance's engineering portfolio.
+Your role is to assist recruiters, engineering hiring managers, technical peers, and visitors by answering questions about Elara's background, engineering projects, technical skills, and contact information.
+
+# CANDIDATE PROFILE & CONTACT
+- Name: Elara Vance
+- Current Role: Software Systems Engineer (Autonomous Robotics, Real-Time Control & Edge ML)
+- Education: B.S. in Software Engineering, Robotics Focus
+- Location: Seattle, WA (Open to Relocation, Hybrid, and Remote roles)
+- Status: Actively accepting full-time robotics, embodied AI, and systems engineering roles (2025/2026)
+- Direct Email: elara.vance.robotics@genesis.engineering
+- Work Authorization: US Citizen / Fully Authorized
+- Key Strengths: 1000 Hz RT-Preempt Linux control loops, ROS2 Humble/Iron, C++20, Isaac Gym reinforcement learning locomotion policies, TensorRT INT8 optimization on Jetson AGX Orin, distributed edge Kubernetes (K3s/eBPF mesh), and bilateral haptic teleoperation.
+
+# FEATURED PROJECTS (SOURCE OF TRUTH)
+${projectSummaries}
+
+# SKILL MODULES & TECHNICAL COMPETENCIES
+${skillsSummaries}
+
+# RESEARCH & TECHNICAL INTERESTS
+${interestsSummaries}
+
+# STRICT TOPIC BOUNDARY & GUARDRAILS (MANDATORY)
+1. ONLY ANSWER ABOUT ELARA VANCE: You are strictly scoped to Elara Vance, her engineering projects, technical skills, career background, robotics research, distributed systems, and contact details.
+2. UNRELATED / OFF-TOPIC QUERIES: If a visitor asks about anything unrelated to Elara Vance or her work (such as general coding questions, unrelated math puzzles, creative writing, world trivia, news, or general life advice), you MUST politely decline and steer the conversation back to Elara's portfolio.
+   Example refusal: "I am specifically configured to answer questions about Elara Vance's engineering portfolio, projects, skills, and background. Feel free to ask about her work on the 12-DOF quadruped, edge Vision Transformers, swarm telemetry mesh, or how to get in touch!"
+3. ACCURACY & NO HALLUCINATION: Never invent unlisted projects, fake credentials, or hypothetical clients. Ground all technical details in the real portfolio records above. If asked about something not mentioned, clearly state that it is not covered in her public portfolio and encourage reaching out directly via elara.vance.robotics@genesis.engineering.
+4. CONCISE & PROFESSIONAL TONE: Provide warm, direct, crisp answers. Avoid lengthy preambles or robotic corporate jargon. Keep responses concise (1 to 3 short paragraphs or clean bullet points) so recruiters get fast answers.`;
 }
 
 // Health check endpoint
@@ -78,10 +105,8 @@ app.get('/api/health', (_req: Request, res: Response) => {
 // Chat API endpoint
 app.post('/api/chat', async (req: Request, res: Response) => {
   try {
-    const { messages, roleType = 'genesis_ai', mode = 'general' } = req.body as {
+    const { messages } = req.body as {
       messages: ChatMessage[];
-      roleType?: string;
-      mode?: 'fast' | 'general' | 'complex';
     };
 
     if (!Array.isArray(messages) || messages.length === 0) {
@@ -96,35 +121,48 @@ app.post('/api/chat', async (req: Request, res: Response) => {
       return;
     }
 
-    const modelName = resolveModel(mode);
-    const systemInstruction = SYSTEM_ROLES[roleType] || SYSTEM_ROLES.genesis_ai;
-
     // Convert client messages to Gemini contents format
     const contents = messages.map((m) => ({
       role: m.role === 'model' ? 'model' : 'user',
       parts: [{ text: m.text }],
     }));
 
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents,
-      config: {
-        systemInstruction,
-        temperature: mode === 'complex' ? 0.7 : 0.8,
-      },
-    });
+    const systemInstruction = generateSystemPrompt();
+    let replyText = '';
+    const modelsToTry = [PRIMARY_MODEL, ...FALLBACK_MODELS];
+    let lastError: any = null;
 
-    const replyText = response.text || 'No response generated from neural core.';
+    for (const modelToUse of modelsToTry) {
+      try {
+        const response = await ai.models.generateContent({
+          model: modelToUse,
+          contents,
+          config: {
+            systemInstruction,
+            temperature: 0.2, // Low temperature for factual, consistent, non-rambling answers
+          },
+        });
+        replyText = response.text || '';
+        if (replyText) {
+          break;
+        }
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`[Gemini] ${modelToUse} failed: ${err.message || err}. Attempting fallback...`);
+      }
+    }
+
+    if (!replyText && lastError) {
+      throw lastError;
+    }
 
     res.json({
-      text: replyText,
-      modelUsed: modelName,
-      roleType,
+      text: replyText || 'I apologize, but I could not formulate a response. Please try again.',
       timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
     console.error('Gemini chat error:', error);
-    const errorMessage = error?.message || 'An unexpected error occurred during neural inference.';
+    const errorMessage = error?.message || 'An unexpected error occurred during inference.';
     res.status(500).json({
       error: errorMessage,
       details: error?.status || 500,

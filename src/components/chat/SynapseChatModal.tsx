@@ -6,11 +6,7 @@ export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
   timestamp: string;
-  modelUsed?: string;
 }
-
-export type ChatRoleType = 'genesis_ai' | 'robotics_engineer' | 'ml_architect';
-export type ChatSpeedMode = 'fast' | 'general' | 'complex';
 
 interface SynapseChatModalProps {
   isOpen: boolean;
@@ -18,82 +14,31 @@ interface SynapseChatModalProps {
   initialPrompt?: string;
 }
 
-const ROLES: { id: ChatRoleType; name: string; tag: string; icon: string; description: string }[] = [
-  {
-    id: 'genesis_ai',
-    name: 'Genesis Co-Pilot',
-    tag: 'SYS_CORE',
-    icon: 'neurology',
-    description: 'Autonomous cybernetic assistant knowledgeable on Elara Vance’s research & projects.',
-  },
-  {
-    id: 'robotics_engineer',
-    name: 'Kinematics Specialist',
-    tag: 'ROS2_1KHZ',
-    icon: 'precision_manufacturing',
-    description: 'Hardware actuation, inverse kinematics, rigid body control, and CAN/RT timing.',
-  },
-  {
-    id: 'ml_architect',
-    name: 'Edge ML Architect',
-    tag: 'TENSOR_INT8',
-    icon: 'memory',
-    description: 'Vision Transformers, TensorRT graph optimization, CUDA kernels, and Jetson Orin.',
-  },
-];
-
-const MODES: { id: ChatSpeedMode; label: string; modelName: string; badge: string; desc: string }[] = [
-  {
-    id: 'fast',
-    label: 'Fast Reflex',
-    modelName: 'gemini-3.1-flash-lite',
-    badge: '⚡ Lite',
-    desc: 'Instant responses with minimal latency',
-  },
-  {
-    id: 'general',
-    label: 'General Analysis',
-    modelName: 'gemini-3.5-flash',
-    badge: '🌐 Standard',
-    desc: 'High fidelity for engineering architecture',
-  },
-  {
-    id: 'complex',
-    label: 'Complex Reasoning',
-    modelName: 'gemini-3.1-pro-preview',
-    badge: '🔬 Pro Preview',
-    desc: 'Deep mathematical & structural synthesis',
-  },
-];
-
 const SUGGESTIONS = [
-  'Explain the 1000 Hz RT-Preempt quadruped control loop.',
-  'How did you achieve INT8 ViT inference under 14.2W on Jetson Orin?',
-  'What is the consensus mechanism in the Synapse K8s swarm mesh?',
-  'Calculate motor torque constraints for 12-DOF rough terrain navigation.',
+  'What projects have you worked on?',
+  'What are your strongest skills?',
+  'Tell me about your robotics experience.',
+  'How can I get in touch with you?',
 ];
+
+const INITIAL_WELCOME: ChatMessage = {
+  id: 'init-msg',
+  role: 'model',
+  text: "Hi! I'm an AI trained on Elara Vance's background and projects. Ask me anything about her skills, work, or how to get in touch.",
+  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+};
 
 export const SynapseChatModal: React.FC<SynapseChatModalProps> = ({
   isOpen,
   onClose,
   initialPrompt,
 }) => {
-  const [roleType, setRoleType] = useState<ChatRoleType>('genesis_ai');
-  const [speedMode, setSpeedMode] = useState<ChatSpeedMode>('general');
   const [inputVal, setInputVal] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'init-msg',
-      role: 'model',
-      text: 'Neural telemetry link established. I am Genesis AI, the embodied intelligence co-pilot for Elara Vance’s robotics architectures. How can I assist your engineering query today?',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      modelUsed: 'gemini-3.5-flash',
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_WELCOME]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -117,6 +62,17 @@ export const SynapseChatModal: React.FC<SynapseChatModalProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isSending]);
 
+  // Handle ESC key to close
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   const handleSendMessage = async (textToSend?: string) => {
     const query = (textToSend || inputVal).trim();
     if (!query || isSending) return;
@@ -136,7 +92,7 @@ export const SynapseChatModal: React.FC<SynapseChatModalProps> = ({
     setIsSending(true);
 
     try {
-      // Map history to server format
+      // Map history to server format (user / model)
       const payloadMessages = nextHistory.map((m) => ({
         role: m.role,
         text: m.text,
@@ -149,8 +105,6 @@ export const SynapseChatModal: React.FC<SynapseChatModalProps> = ({
         },
         body: JSON.stringify({
           messages: payloadMessages,
-          roleType,
-          mode: speedMode,
         }),
       });
 
@@ -165,13 +119,12 @@ export const SynapseChatModal: React.FC<SynapseChatModalProps> = ({
         role: 'model',
         text: data.text,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        modelUsed: data.modelUsed,
       };
 
       setMessages((prev) => [...prev, modelMessage]);
     } catch (err: any) {
       console.error('Chat error:', err);
-      setErrorMsg(err.message || 'Transmission disrupted. Check your connection or API key configuration.');
+      setErrorMsg(err.message || 'Unable to connect to assistant. Please try again.');
     } finally {
       setIsSending(false);
     }
@@ -188,18 +141,14 @@ export const SynapseChatModal: React.FC<SynapseChatModalProps> = ({
       {
         id: `reset-${Date.now()}`,
         role: 'model',
-        text: 'Session telemetry cleared. New neural link primed. State your engineering query.',
+        text: "Hi! I'm an AI trained on Elara Vance's background and projects. Ask me anything about her skills, work, or how to get in touch.",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        modelUsed: MODES.find((m) => m.id === speedMode)?.modelName,
       },
     ]);
     setErrorMsg(null);
   };
 
   if (!isOpen) return null;
-
-  const currentRole = ROLES.find((r) => r.id === roleType) || ROLES[0];
-  const currentMode = MODES.find((m) => m.id === speedMode) || MODES[1];
 
   return (
     <div
@@ -208,78 +157,37 @@ export const SynapseChatModal: React.FC<SynapseChatModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-4xl h-[90vh] max-h-[820px] rounded-2xl bg-[#12161C] border border-[#00D4FF]/30 shadow-[0_24px_80px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden"
+        className="relative w-full max-w-3xl h-[88vh] max-h-[760px] rounded-2xl bg-[#12161C] border border-[#00D4FF]/30 shadow-[0_24px_80px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden"
       >
         {/* Window Chrome Header */}
         <WindowChrome
-          title={`synapse_uplink.sh [${currentRole.tag}] // ${currentMode.modelName}`}
+          title="Chat with my AI Assistant"
           icon="neurology"
-          tag="GEMINI_UPLINK"
+          tag="GENESIS_AI"
           actionText="CLOSE [ESC]"
           onAction={onClose}
         />
 
-        {/* Sub-Header: Role & Model Controls */}
-        <div className="px-4 py-3 bg-[#0E1217] border-b border-[#00D4FF]/15 flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
-          {/* Role Selector Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
-            <span className="font-code text-[10px] text-[#5B6B75] uppercase tracking-wider mr-1 hidden sm:inline">
-              ROLE:
+        {/* Clean Sub-Header with Assistant Status and Clear History */}
+        <div className="px-4 py-2.5 bg-[#0E1217] border-b border-[#00D4FF]/15 flex items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#00D4FF] animate-pulse" />
+            <span className="font-code text-xs text-[#EAF2F5] font-medium tracking-wide">
+              AI Portfolio Assistant
             </span>
-            {ROLES.map((role) => {
-              const active = roleType === role.id;
-              return (
-                <button
-                  key={role.id}
-                  onClick={() => setRoleType(role.id)}
-                  title={role.description}
-                  className={`px-2.5 py-1 rounded-lg font-code text-xs tracking-wide flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
-                    active
-                      ? 'bg-[#00D4FF]/15 border border-[#00D4FF] text-[#00D4FF] shadow-[0_0_10px_rgba(0,212,255,0.3)]'
-                      : 'bg-[#182028]/60 border border-[#182028] text-[#5B6B75] hover:text-[#EAF2F5]'
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-[13px]">{role.icon}</span>
-                  <span>{role.name}</span>
-                </button>
-              );
-            })}
+            <span className="font-code text-[11px] text-[#5B6B75] hidden sm:inline">
+              • Trained on Elara Vance's background &amp; projects
+            </span>
           </div>
 
-          {/* Model / Speed Selector */}
-          <div className="flex items-center gap-1.5 shrink-0 self-end md:self-auto">
-            <span className="font-code text-[10px] text-[#5B6B75] uppercase tracking-wider mr-1 hidden sm:inline">
-              ENGINE:
-            </span>
-            {MODES.map((mode) => {
-              const active = speedMode === mode.id;
-              return (
-                <button
-                  key={mode.id}
-                  onClick={() => setSpeedMode(mode.id)}
-                  title={`${mode.modelName} — ${mode.desc}`}
-                  className={`px-2 py-0.5 rounded font-code text-[11px] transition-all cursor-pointer ${
-                    active
-                      ? mode.id === 'complex'
-                        ? 'bg-[#FF9F45]/20 border border-[#FF9F45] text-[#FF9F45] shadow-[0_0_10px_rgba(255,159,69,0.3)] font-semibold'
-                        : 'bg-[#7B61FF]/20 border border-[#7B61FF] text-[#7B61FF] shadow-[0_0_10px_rgba(123,97,255,0.3)] font-semibold'
-                      : 'bg-[#182028] text-[#5B6B75] border border-transparent hover:text-[#EAF2F5]'
-                  }`}
-                >
-                  {mode.badge}
-                </button>
-              );
-            })}
-
-            {/* Clear History Button */}
-            <button
-              onClick={handleClearHistory}
-              title="Clear conversation history"
-              className="p-1 rounded text-[#5B6B75] hover:text-[#FF5F57] hover:bg-[#182028] transition-colors ml-1 cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[16px]">delete_sweep</span>
-            </button>
-          </div>
+          <button
+            onClick={handleClearHistory}
+            title="Clear conversation history"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-code text-[11px] text-[#5B6B75] hover:text-[#FF5F57] hover:bg-[#182028] transition-colors cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[15px]">delete_sweep</span>
+            <span className="hidden sm:inline">Clear Chat</span>
+          </button>
         </div>
 
         {/* Scrollable Message Thread */}
@@ -293,17 +201,11 @@ export const SynapseChatModal: React.FC<SynapseChatModalProps> = ({
                   isUser ? 'self-end items-end' : 'self-start items-start'
                 }`}
               >
-                {/* Meta Header */}
+                {/* Meta Header without developer tags */}
                 <div className="flex items-center gap-2 px-1 text-[10px] font-code text-[#5B6B75]">
-                  <span>{isUser ? 'OPERATOR' : currentRole.name.toUpperCase()}</span>
+                  <span>{isUser ? 'YOU' : "ELARA'S AI ASSISTANT"}</span>
                   <span>•</span>
                   <span>{msg.timestamp}</span>
-                  {msg.modelUsed && (
-                    <>
-                      <span>•</span>
-                      <span className="text-[#00D4FF]">{msg.modelUsed}</span>
-                    </>
-                  )}
                 </div>
 
                 {/* Message Bubble */}
@@ -333,20 +235,20 @@ export const SynapseChatModal: React.FC<SynapseChatModalProps> = ({
             );
           })}
 
-          {/* Loading Animation Bubble */}
+          {/* Simple "Thinking..." Indicator */}
           {isSending && (
             <div className="self-start flex flex-col gap-1 max-w-[70%]">
               <div className="flex items-center gap-2 px-1 text-[10px] font-code text-[#5B6B75]">
-                <span>{currentRole.name.toUpperCase()}</span>
+                <span>ELARA'S AI ASSISTANT</span>
                 <span>•</span>
-                <span className="text-[#00D4FF] animate-pulse">PROCESSING INFERENCE...</span>
+                <span className="text-[#00D4FF]">Thinking...</span>
               </div>
               <div className="p-3.5 rounded-xl bg-[#12161C] border border-[#7B61FF]/30 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#00D4FF] animate-ping-subtle" />
                 <span className="w-2 h-2 rounded-full bg-[#7B61FF] animate-pulse" />
                 <span className="w-2 h-2 rounded-full bg-[#FF9F45] animate-bounce" />
                 <span className="font-code text-xs text-[#5B6B75] ml-2">
-                  Querying {currentMode.modelName}...
+                  Thinking...
                 </span>
               </div>
             </div>
@@ -371,16 +273,16 @@ export const SynapseChatModal: React.FC<SynapseChatModalProps> = ({
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Suggestion Chips */}
-        <div className="px-4 py-2 bg-[#0E1217] border-t border-[#182028] overflow-x-auto flex items-center gap-2">
+        {/* Approachable Suggestion Chips for General Visitors */}
+        <div className="px-4 py-2.5 bg-[#0E1217] border-t border-[#182028] overflow-x-auto flex items-center gap-2">
           <span className="font-code text-[10px] text-[#5B6B75] uppercase tracking-wider shrink-0">
-            PROMPTS:
+            SUGGESTIONS:
           </span>
           {SUGGESTIONS.map((item, idx) => (
             <button
               key={idx}
               onClick={() => handleSendMessage(item)}
-              className="px-2.5 py-1 rounded-full bg-[#12161C] hover:bg-[#182028] border border-[#00D4FF]/20 hover:border-[#00D4FF] text-[#EAF2F5]/75 hover:text-[#00D4FF] font-code text-[11px] whitespace-nowrap transition-colors cursor-pointer shrink-0"
+              className="px-2.5 py-1 rounded-full bg-[#12161C] hover:bg-[#182028] border border-[#00D4FF]/20 hover:border-[#00D4FF] text-[#EAF2F5]/80 hover:text-[#00D4FF] font-code text-[11px] whitespace-nowrap transition-colors cursor-pointer shrink-0"
             >
               {item}
             </button>
@@ -396,11 +298,11 @@ export const SynapseChatModal: React.FC<SynapseChatModalProps> = ({
             }}
             className="flex-1 flex items-center gap-2 bg-[#0B0F13] border border-[#182028] focus-within:border-[#00D4FF] rounded-xl px-3 py-1.5 transition-colors"
           >
-            <span className="material-symbols-outlined text-sm text-[#00D4FF]">terminal</span>
+            <span className="material-symbols-outlined text-sm text-[#00D4FF]">chat</span>
             <input
               ref={inputRef}
               type="text"
-              placeholder={`Ask ${currentRole.name} [e.g., kinematics, Isaac Gym, TensorRT]...`}
+              placeholder="Ask me anything about my work..."
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
               disabled={isSending}
