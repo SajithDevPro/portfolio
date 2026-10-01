@@ -1,5 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useTheme, PortfolioTheme, FontStyle, BackgroundStyle } from '../../context/ThemeContext';
+import {
+  useTheme,
+  PortfolioTheme,
+  FontStyle,
+  BackgroundStyle,
+  THEME_LIST,
+} from '../../context/ThemeContext';
 
 export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
   const {
@@ -25,56 +31,6 @@ export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const themes: {
-    id: PortfolioTheme;
-    label: string;
-    tag: string;
-    icon: string;
-    desc: string;
-    colorPreview: string;
-  }[] = [
-    {
-      id: 'studio',
-      label: 'Studio Slate',
-      tag: 'RECOMMENDED',
-      icon: 'palette',
-      desc: 'Warm ergonomic dark slate with soft ambient lighting',
-      colorPreview: 'bg-[#131A26] border-[#38BDF8]',
-    },
-    {
-      id: 'light',
-      label: 'Daylight Paper',
-      tag: 'WARM LIGHT',
-      icon: 'light_mode',
-      desc: 'Clean, warm daylight mode for sunny environments & easy reading',
-      colorPreview: 'bg-[#FFFFFF] border-[#0284C7]',
-    },
-    {
-      id: 'amber',
-      label: 'Warm Amber',
-      tag: 'COZY WARMTH',
-      icon: 'wb_sunny',
-      desc: 'Comforting bronze & golden sunset palette with soft amber glow',
-      colorPreview: 'bg-[#1E1A16] border-[#F59E0B]',
-    },
-    {
-      id: 'forest',
-      label: 'Nordic Emerald',
-      tag: 'CALM & MINT',
-      icon: 'forest',
-      desc: 'Serene dark pine & sage greens with gentle teal radiance',
-      colorPreview: 'bg-[#101F1B] border-[#10B981]',
-    },
-    {
-      id: 'midnight',
-      label: 'Midnight Obsidian',
-      tag: 'HIGH CONTRAST',
-      icon: 'dark_mode',
-      desc: 'Deep cosmic space with electric neon accents',
-      colorPreview: 'bg-[#0C111A] border-[#00D4FF]',
-    },
-  ];
-
   const fontOptions: {
     id: FontStyle;
     label: string;
@@ -87,16 +43,16 @@ export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false
       id: 'friendly',
       label: 'Friendly & Warm',
       sample: 'Outfit + DM Sans',
-      tag: 'MOST FRIENDLY',
-      desc: 'Soft rounded geometry, warm curves, exceptionally inviting & human',
+      tag: 'DEFAULT & INVITING',
+      desc: 'Soft rounded geometry, human apertures, exceptionally approachable',
       fontFamily: "'Outfit', sans-serif",
     },
     {
       id: 'modern',
       label: 'Clean & Modern',
       sample: 'Plus Jakarta Sans',
-      tag: 'CONTEMPORARY',
-      desc: 'Balanced, crisp studio grotesque designed for digital clarity',
+      tag: 'PRECISION TECH',
+      desc: 'Balanced studio grotesque designed for executive clarity & speed',
       fontFamily: "'Plus Jakarta Sans', sans-serif",
     },
     {
@@ -107,35 +63,54 @@ export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false
       desc: 'Generous x-height & wide open apertures for effortless skimming',
       fontFamily: "'DM Sans', sans-serif",
     },
+    {
+      id: 'editorial',
+      label: 'Luxury Editorial Serif',
+      sample: 'Cormorant Garamond',
+      tag: 'HIGH-END LUXURY',
+      desc: 'Refined classical serif headlines paired with modern body prose',
+      fontFamily: "'Cormorant Garamond', Georgia, serif",
+    },
   ];
 
   const bgOptions: {
     id: BackgroundStyle;
     label: string;
+    tag: string;
     icon: string;
     desc: string;
   }[] = [
     {
+      id: 'constellation',
+      label: 'Cosmic Constellation Canvas',
+      tag: 'INTERACTIVE 60FPS',
+      icon: 'grain',
+      desc: 'Floating stars and neural physics nodes that connect and respond to cursor movement',
+    },
+    {
       id: 'ambient',
-      label: 'Ambient Glow',
+      label: 'Atmospheric Aurora Glow',
+      tag: 'FLUID CHROMATIC',
       icon: 'blur_on',
-      desc: 'Soft atmospheric multi-color light auras that flow gently behind content',
+      desc: 'Silky multi-layer flowing chromatic auroras with floating bokeh dust motes',
     },
     {
       id: 'mesh',
-      label: 'Subtle Grid Mesh',
+      label: 'Architectural Blueprint Grid',
+      tag: 'ENGINEERING',
       icon: 'grid_4x4',
-      desc: 'Fine architectural blueprint grid for an engineering aesthetic',
+      desc: 'Fine precision laser coordinate grid with a soft scanning beam',
     },
     {
       id: 'minimal',
-      label: 'Clean Minimal',
+      label: 'Velvet Minimal Matte',
+      tag: 'DISTRACTION-FREE',
       icon: 'check_box_outline_blank',
-      desc: 'Distraction-free pure backdrop with smooth subtle vignette',
+      desc: 'Clean, deep matte luxury backdrop with subtle corner lighting caustics',
     },
   ];
 
-  const currentTheme = themes.find((t) => t.id === theme) || themes[0];
+  const currentTheme = THEME_LIST.find((t) => t.id === theme) || THEME_LIST[0];
   const currentFont = fontOptions.find((f) => f.id === fontStyle) || fontOptions[0];
 
   return (
@@ -143,12 +118,13 @@ export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] hover:border-[var(--accent-cyan)]/50 text-[var(--text-primary)] font-body text-xs font-medium transition-all active:scale-95 cursor-pointer shadow-sm group"
-        title="Customize Theme, Friendly Font, and Background"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] hover:border-[var(--accent-cyan)]/50 text-[var(--text-primary)] font-body text-xs font-medium transition-all active:scale-95 cursor-pointer shadow-sm group"
+        title="Customize Theme, Typography, and Background Canvas (Press T for Theme, F for Font, B for Canvas)"
       >
-        <span className="material-symbols-outlined text-[17px] text-[var(--accent-cyan)] group-hover:rotate-45 transition-transform duration-300">
-          palette
-        </span>
+        <span
+          className="w-2.5 h-2.5 rounded-full ring-2 ring-[var(--border-subtle)] group-hover:scale-110 transition-transform"
+          style={{ backgroundColor: currentTheme.accentColor }}
+        />
         {!compact && (
           <div className="hidden sm:flex items-center gap-1.5 text-xs font-medium">
             <span className="text-[var(--text-primary)] font-semibold">{currentTheme.label}</span>
@@ -156,113 +132,123 @@ export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false
             <span className="text-[var(--accent-cyan)] text-[11px]">{currentFont.sample.split(' ')[0]}</span>
           </div>
         )}
-        <span className="material-symbols-outlined text-[14px] text-[var(--text-muted)]">
+        <span className="material-symbols-outlined text-[14px] text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition-colors">
           {isOpen ? 'expand_less' : 'expand_more'}
         </span>
       </button>
 
       {/* Dropdown Customizer Panel */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-88 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-strong)] p-3 shadow-[0_20px_50px_rgba(0,0,0,0.45)] z-50 animate-fadeIn backdrop-blur-2xl">
+        <div className="absolute right-0 mt-2 w-84 sm:w-96 max-h-[85vh] overflow-y-auto rounded-2xl bg-[var(--bg-surface)]/98 border border-[var(--border-strong)] p-3.5 shadow-[0_24px_60px_rgba(0,0,0,0.5)] z-50 animate-fadeIn backdrop-blur-2xl">
           {/* Header & Tabs */}
-          <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2 mb-2">
+          <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2.5 mb-2.5">
             <div className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[18px] text-[var(--accent-cyan)]">
                 tune
               </span>
               <span className="text-xs font-display font-bold uppercase tracking-wider text-[var(--text-primary)]">
-                Display &amp; Style
+                Display &amp; Aesthetics
               </span>
             </div>
             <div className="flex bg-[var(--bg-surface-elevated)] p-0.5 rounded-lg border border-[var(--border-subtle)]">
               <button
                 onClick={() => setActiveTab('theme')}
-                className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-md text-[10.5px] font-semibold transition-all cursor-pointer ${
                   activeTab === 'theme'
-                    ? 'bg-[var(--accent-cyan)] text-[var(--bg-page)]'
+                    ? 'bg-[var(--accent-cyan)] text-[var(--bg-page)] shadow-xs'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
-                Theme
+                Themes ({THEME_LIST.length})
               </button>
               <button
                 onClick={() => setActiveTab('font')}
-                className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-md text-[10.5px] font-semibold transition-all cursor-pointer ${
                   activeTab === 'font'
-                    ? 'bg-[var(--accent-cyan)] text-[var(--bg-page)]'
+                    ? 'bg-[var(--accent-cyan)] text-[var(--bg-page)] shadow-xs'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
-                Font Style
+                Typography
               </button>
               <button
                 onClick={() => setActiveTab('bg')}
-                className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-md text-[10.5px] font-semibold transition-all cursor-pointer ${
                   activeTab === 'bg'
-                    ? 'bg-[var(--accent-cyan)] text-[var(--bg-page)]'
+                    ? 'bg-[var(--accent-cyan)] text-[var(--bg-page)] shadow-xs'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
-                Background
+                Canvas
               </button>
             </div>
           </div>
 
-          {/* Tab 1: Themes */}
+          {/* TAB 1: 8 CURATED PREMIUM THEMES */}
           {activeTab === 'theme' && (
             <div className="flex flex-col gap-1.5">
-              <div className="text-[11px] text-[var(--text-muted)] px-1 mb-0.5">
-                Choose a color palette tailored for reading comfort:
+              <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)] px-1 mb-1">
+                <span>Select a color palette:</span>
+                <span className="text-[10px] font-mono text-[var(--accent-cyan)]">Shortcut: Press 'T'</span>
               </div>
-              {themes.map((t) => {
-                const active = t.id === theme;
-                return (
-                  <button
-                    key={t.id}
-                    onClick={() => setTheme(t.id)}
-                    className={`w-full flex items-start gap-2.5 p-2 rounded-xl text-left transition-all cursor-pointer ${
-                      active
-                        ? 'bg-[var(--accent-cyan)]/15 text-[var(--text-primary)] border border-[var(--accent-cyan)]/50 shadow-sm'
-                        : 'hover:bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] border border-transparent'
-                    }`}
-                  >
-                    <span
-                      className={`material-symbols-outlined text-[19px] mt-0.5 ${
-                        active ? 'text-[var(--accent-cyan)]' : 'text-[var(--text-muted)]'
+
+              <div className="grid grid-cols-1 gap-1.5">
+                {THEME_LIST.map((t) => {
+                  const active = t.id === theme;
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => setTheme(t.id)}
+                      className={`w-full flex items-center gap-3 p-2 rounded-xl text-left transition-all cursor-pointer ${
+                        active
+                          ? 'bg-[var(--accent-cyan)]/15 text-[var(--text-primary)] border border-[var(--accent-cyan)]/50 shadow-sm'
+                          : 'hover:bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] border border-transparent'
                       }`}
                     >
-                      {t.icon}
-                    </span>
-                    <div className="flex flex-col min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-1">
-                        <span className="text-xs font-semibold text-[var(--text-primary)]">
-                          {t.label}
-                        </span>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-[var(--bg-surface-subtle)] text-[var(--text-muted)] font-mono border border-[var(--border-subtle)]">
-                            {t.tag}
-                          </span>
-                          {active && (
-                            <span className="w-2 h-2 rounded-full bg-[var(--accent-cyan)] animate-pulse" />
-                          )}
-                        </div>
+                      {/* Theme color swatch preview */}
+                      <div
+                        className="w-7 h-7 rounded-lg border border-white/20 flex items-center justify-center shrink-0 shadow-xs"
+                        style={{ backgroundColor: t.previewBg }}
+                      >
+                        <span
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: t.accentColor }}
+                        />
                       </div>
-                      <span className="text-[11px] text-[var(--text-muted)] line-clamp-1 mt-0.5">
-                        {t.desc}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-xs font-semibold text-[var(--text-primary)]">
+                            {t.label}
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--bg-surface-subtle)] text-[var(--text-muted)] font-mono border border-[var(--border-subtle)]">
+                              {t.tag}
+                            </span>
+                            {active && (
+                              <span className="w-2 h-2 rounded-full bg-[var(--accent-cyan)] animate-pulse" />
+                            )}
+                          </div>
+                        </div>
+                        <span className="text-[10.5px] text-[var(--text-muted)] line-clamp-1 mt-0.5">
+                          {t.desc}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 
-          {/* Tab 2: Font Styles (User-Friendly) */}
+          {/* TAB 2: 4 USER-FRIENDLY TYPOGRAPHY STYLES */}
           {activeTab === 'font' && (
             <div className="flex flex-col gap-2">
-              <div className="text-[11px] text-[var(--text-muted)] px-1 mb-0.5">
-                Select a user-friendly typeface style for headers &amp; body:
+              <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)] px-1 mb-0.5">
+                <span>Select a typeface style:</span>
+                <span className="text-[10px] font-mono text-[var(--accent-cyan)]">Shortcut: Press 'F'</span>
               </div>
+
               {fontOptions.map((f) => {
                 const active = f.id === fontStyle;
                 return (
@@ -284,7 +270,7 @@ export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false
                           {f.label}
                         </span>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-[var(--accent-cyan)]/20 text-[var(--accent-cyan)] font-mono font-bold">
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--accent-cyan)]/20 text-[var(--accent-cyan)] font-mono font-bold">
                             {f.tag}
                           </span>
                           {active && (
@@ -310,26 +296,28 @@ export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false
             </div>
           )}
 
-          {/* Tab 3: Background Styles */}
+          {/* TAB 3: 4 CANVAS ATMOSPHERES */}
           {activeTab === 'bg' && (
-            <div className="flex flex-col gap-1.5">
-              <div className="text-[11px] text-[var(--text-muted)] px-1 mb-0.5">
-                Adjust background lighting and atmospheric mood:
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)] px-1 mb-0.5">
+                <span>Select dynamic canvas mode:</span>
+                <span className="text-[10px] font-mono text-[var(--accent-cyan)]">Shortcut: Press 'B'</span>
               </div>
+
               {bgOptions.map((b) => {
                 const active = b.id === backgroundStyle;
                 return (
                   <button
                     key={b.id}
                     onClick={() => setBackgroundStyle(b.id)}
-                    className={`w-full flex items-start gap-2.5 p-2 rounded-xl text-left transition-all cursor-pointer ${
+                    className={`w-full flex items-start gap-2.5 p-2.5 rounded-xl text-left transition-all cursor-pointer ${
                       active
                         ? 'bg-[var(--accent-cyan)]/15 text-[var(--text-primary)] border border-[var(--accent-cyan)]/50 shadow-sm'
                         : 'hover:bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] border border-transparent'
                     }`}
                   >
                     <span
-                      className={`material-symbols-outlined text-[19px] mt-0.5 ${
+                      className={`material-symbols-outlined text-[20px] mt-0.5 ${
                         active ? 'text-[var(--accent-cyan)]' : 'text-[var(--text-muted)]'
                       }`}
                     >
@@ -340,13 +328,18 @@ export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false
                         <span className="text-xs font-semibold text-[var(--text-primary)]">
                           {b.label}
                         </span>
-                        {active && (
-                          <span className="material-symbols-outlined text-[16px] text-[var(--accent-cyan)]">
-                            check_circle
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--bg-surface-subtle)] text-[var(--text-muted)] font-mono border border-[var(--border-subtle)]">
+                            {b.tag}
                           </span>
-                        )}
+                          {active && (
+                            <span className="material-symbols-outlined text-[16px] text-[var(--accent-cyan)]">
+                              check_circle
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <span className="text-[11px] text-[var(--text-muted)] mt-0.5">
+                      <span className="text-[11px] text-[var(--text-muted)] mt-1">
                         {b.desc}
                       </span>
                     </div>
@@ -356,18 +349,25 @@ export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false
             </div>
           )}
 
-          {/* Footer note */}
-          <div className="mt-2.5 pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-[10px] text-[var(--text-muted)] px-1">
-            <span>Preferences saved locally</span>
+          {/* Footer controls & Shortcuts helper */}
+          <div className="mt-3 pt-2.5 border-t border-[var(--border-subtle)] flex items-center justify-between text-[10.5px] text-[var(--text-muted)] px-1">
+            <span className="flex items-center gap-1">
+              <span className="px-1 py-0.2 rounded bg-[var(--bg-surface-elevated)] font-mono text-[9px] border border-[var(--border-subtle)]">T</span>
+              <span>Theme</span>
+              <span className="px-1 py-0.2 rounded bg-[var(--bg-surface-elevated)] font-mono text-[9px] border border-[var(--border-subtle)] ml-1">F</span>
+              <span>Font</span>
+              <span className="px-1 py-0.2 rounded bg-[var(--bg-surface-elevated)] font-mono text-[9px] border border-[var(--border-subtle)] ml-1">B</span>
+              <span>Canvas</span>
+            </span>
             <button
               onClick={() => {
                 setTheme('studio');
                 setFontStyle('friendly');
-                setBackgroundStyle('ambient');
+                setBackgroundStyle('constellation');
               }}
-              className="text-[var(--accent-cyan)] hover:underline cursor-pointer"
+              className="text-[var(--accent-cyan)] hover:underline cursor-pointer font-medium"
             >
-              Reset to Defaults
+              Reset Defaults
             </button>
           </div>
         </div>

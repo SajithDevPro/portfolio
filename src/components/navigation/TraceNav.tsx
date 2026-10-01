@@ -31,16 +31,15 @@ export const TraceNav: React.FC<TraceNavProps> = ({ activeNode, onNavigate }) =>
       className="fixed left-0 top-16 bottom-20 z-30 w-12 sm:w-32 lg:w-36 flex flex-col items-start pl-2 sm:pl-3.5 pointer-events-auto select-none"
     >
       <div className="relative h-full flex flex-col justify-center py-4 w-full">
-        {/* Continuous 3D/2D circuit trace line */}
-        <div className="absolute left-[18px] sm:left-[21px] top-6 bottom-6 w-0.5 bg-[#12161C] border-l border-[#00D4FF]/20 overflow-hidden">
-          {/* Animated pulse line */}
+        {/* Continuous clean indicator track line */}
+        <div className="absolute left-[18px] sm:left-[21px] top-6 bottom-6 w-0.5 bg-[var(--border-subtle)] overflow-hidden rounded-full">
+          {/* Static progress fill based on current active section */}
           <div
-            className="w-full bg-gradient-to-b from-[#00D4FF] via-[#7B61FF] to-[#00D4FF]/20 transition-all duration-700 ease-out"
+            className="w-full bg-gradient-to-b from-[var(--accent-cyan)] to-[var(--accent-violet)] transition-all duration-500 ease-out"
             style={{
               height: `${((activeIndex + 1) / NODES.length) * 100}%`
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00D4FF]/60 to-transparent w-full h-1/3 animate-trace-glow" />
         </div>
 
         {/* Trace Nodes */}
@@ -74,20 +73,20 @@ export const TraceNav: React.FC<TraceNavProps> = ({ activeNode, onNavigate }) =>
                   <span
                     className={`w-3.5 h-3.5 rounded-full border transition-all duration-300 flex items-center justify-center ${
                       isActive
-                        ? 'border-[#00D4FF] bg-[#0A0E12] shadow-[0_0_12px_#00D4FF]'
+                        ? 'border-[var(--accent-cyan)] bg-[var(--bg-page)] shadow-[0_0_10px_var(--accent-cyan)]'
                         : isPassed
-                        ? 'border-[#00D4FF]/60 bg-[#12161C]'
-                        : 'border-[#5B6B75]/40 bg-[#0A0E12] group-hover:border-[#00D4FF]/60'
+                        ? 'border-[var(--accent-cyan)]/60 bg-[var(--bg-surface)]'
+                        : 'border-[var(--border-subtle)] bg-[var(--bg-page)] group-hover:border-[var(--accent-cyan)]/60'
                     }`}
                   >
                     {/* Inner glowing dot */}
                     <span
                       className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
                         isActive
-                          ? 'bg-[#00D4FF] shadow-[0_0_6px_#00D4FF]'
+                          ? 'bg-[var(--accent-cyan)] shadow-[0_0_6px_var(--accent-cyan)]'
                           : isPassed
-                          ? 'bg-[#7B61FF]'
-                          : 'bg-[#5B6B75]/40 group-hover:bg-[#00D4FF]/60'
+                          ? 'bg-[var(--accent-violet)]'
+                          : 'bg-[var(--text-muted)] group-hover:bg-[var(--accent-cyan)]/70'
                       }`}
                     />
                   </span>
@@ -95,16 +94,16 @@ export const TraceNav: React.FC<TraceNavProps> = ({ activeNode, onNavigate }) =>
 
                 {/* Visible Label on every node (Requirement 5) */}
                 <div className="hidden sm:flex items-center gap-1.5 ml-2.5 font-code text-[11px] tracking-wide text-left whitespace-nowrap">
-                  <span className={`text-[10px] ${isActive ? 'text-[#00D4FF] font-bold' : 'text-[#5B6B75]'}`}>
+                  <span className={`text-[10px] ${isActive ? 'text-[var(--accent-cyan)] font-bold' : 'text-[var(--text-muted)]'}`}>
                     {node.code}
                   </span>
                   <span
                     className={`uppercase transition-all duration-200 ${
                       isActive
-                        ? 'text-[#00D4FF] font-semibold drop-shadow-[0_0_8px_rgba(0,212,255,0.6)] translate-x-0.5'
+                        ? 'text-[var(--accent-cyan)] font-semibold drop-shadow-[0_0_8px_var(--accent-cyan)] translate-x-0.5'
                         : isPassed
-                        ? 'text-[#EAF2F5]/85 group-hover:text-[#00D4FF]'
-                        : 'text-[#5B6B75] group-hover:text-[#EAF2F5]'
+                        ? 'text-[var(--text-primary)] group-hover:text-[var(--accent-cyan)]'
+                        : 'text-[var(--text-muted)] group-hover:text-[var(--text-primary)]'
                     }`}
                   >
                     {node.label}
@@ -113,13 +112,13 @@ export const TraceNav: React.FC<TraceNavProps> = ({ activeNode, onNavigate }) =>
 
                 {/* Mobile floating tooltip on hover/active */}
                 <div
-                  className={`sm:hidden absolute left-10 px-2 py-0.5 rounded bg-[#12161C]/95 border border-[#00D4FF]/30 backdrop-blur-md font-code text-[10px] whitespace-nowrap pointer-events-none shadow-[0_4px_16px_rgba(0,0,0,0.6)] transition-all duration-200 z-50 flex items-center gap-1.5 ${
+                  className={`sm:hidden absolute left-10 px-2 py-0.5 rounded bg-[var(--bg-surface)] border border-[var(--border-strong)] backdrop-blur-md font-code text-[10px] whitespace-nowrap pointer-events-none shadow-[0_4px_16px_rgba(0,0,0,0.4)] transition-all duration-200 z-50 flex items-center gap-1.5 ${
                     isActive
-                      ? 'opacity-100 translate-x-0 border-[#00D4FF]/60 text-[#00D4FF]'
-                      : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 text-[#EAF2F5]'
+                      ? 'opacity-100 translate-x-0 border-[var(--accent-cyan)]/60 text-[var(--accent-cyan)]'
+                      : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 text-[var(--text-primary)]'
                   }`}
                 >
-                  <span className="text-[#5B6B75]">{node.code}</span>
+                  <span className="text-[var(--text-muted)]">{node.code}</span>
                   <span className="font-semibold">{node.label}</span>
                 </div>
               </button>

@@ -113,7 +113,7 @@ export const HeroTerminal: React.FC<HeroTerminalProps> = ({
         transform: `perspective(1000px) rotateX(${(1 - scrollIntensity) * 4}deg) scale(${0.96 + 0.04 * scrollIntensity}) translateZ(${(1 - scrollIntensity) * -40}px)`,
         transition: 'transform 0.15s ease-out, opacity 0.15s ease-out'
       }}
-      className="flex flex-col w-full rounded-xl bg-[#12161C] border border-[#00D4FF]/15 shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden"
+      className="flex flex-col w-full rounded-xl bg-[var(--bg-surface)] border border-[var(--border-strong)] shadow-[0_12px_36px_rgba(0,0,0,0.35)] overflow-hidden"
     >
       {/* Window Chrome with authentic Mac traffic lights */}
       <WindowChrome
@@ -128,7 +128,7 @@ export const HeroTerminal: React.FC<HeroTerminalProps> = ({
       />
 
       {/* Code Editor Body */}
-      <div className="p-4 sm:p-5 bg-[#0B0F13] font-code text-xs sm:text-[13px] leading-relaxed overflow-x-auto text-[#EAF2F5]/80 select-none min-h-[220px]">
+      <div className="p-4 sm:p-5 bg-[var(--bg-surface-subtle)] font-code text-xs sm:text-[13px] leading-relaxed overflow-x-auto text-[var(--text-primary)] select-none min-h-[220px]">
         {currentSnippet.lines.slice(0, displayedLineCount).map((line, idx) => (
           <div
             key={idx}

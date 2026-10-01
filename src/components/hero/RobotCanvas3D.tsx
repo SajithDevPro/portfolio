@@ -54,8 +54,9 @@ export const RobotCanvas3D: React.FC<RobotCanvas3DProps> = ({
 
     const width = container.clientWidth || 360;
     const height = container.clientHeight || 360;
+    const isMobileDevice = window.innerWidth < 768;
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobileDevice ? 1.25 : 1.6));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.1;
     container.appendChild(renderer.domElement);
@@ -297,6 +298,9 @@ export const RobotCanvas3D: React.FC<RobotCanvas3DProps> = ({
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
+      if (document.hidden || stateRef.current.scrollIntensity <= 0.04) {
+        return;
+      }
       const elapsedTime = clock.getElapsedTime();
       const { isIgnited: ignited, assemblyProgress: targetAssembly, scrollIntensity: power } = stateRef.current;
 

@@ -15,6 +15,8 @@ import { ContactSection } from './components/contact/ContactSection';
 import { DiagnosticsModal } from './components/common/DiagnosticsModal';
 import { ResumeModal } from './components/common/ResumeModal';
 import { SynapseChatModal } from './components/chat/SynapseChatModal';
+import { PremiumBackgroundCanvas } from './components/common/PremiumBackgroundCanvas';
+import { ToastNotification } from './components/common/ToastNotification';
 
 function AppContent() {
   const [bootFinished, setBootFinished] = useState(false);
@@ -92,35 +94,11 @@ function AppContent() {
 
   return (
     <div className="relative min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] selection:bg-[var(--accent-cyan)]/25 selection:text-[var(--text-primary)] flex flex-col font-body transition-colors duration-300">
-      {/* User-Friendly Multi-Layer Atmospheric Lighting Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 select-none">
-        {backgroundStyle !== 'minimal' && (
-          <>
-            {/* Top Sky Glow */}
-            <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-[var(--accent-cyan)]/14 via-[var(--accent-violet)]/8 to-transparent rounded-full blur-3xl opacity-75" />
-            
-            {/* Right Accent Ambient Shimmer */}
-            <div className="absolute top-[32%] -right-40 w-[600px] h-[600px] bg-gradient-to-bl from-[var(--accent-violet)]/12 via-[var(--accent-cyan)]/6 to-transparent rounded-full blur-3xl opacity-50" />
-            
-            {/* Left Warm Amber/Teal Glow */}
-            <div className="absolute top-[65%] -left-40 w-[600px] h-[600px] bg-gradient-to-tr from-[var(--accent-amber)]/10 via-[var(--accent-cyan)]/6 to-transparent rounded-full blur-3xl opacity-45" />
-          </>
-        )}
+      {/* Interactive Ultra-Premium Background Canvas & Atmospheric Lighting Engine */}
+      <PremiumBackgroundCanvas />
 
-        {/* Minimal clean gradient fallback */}
-        {backgroundStyle === 'minimal' && (
-          <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-surface)]/40 via-transparent to-[var(--bg-surface)]/20" />
-        )}
-        
-        {/* Subtle Architectural Grid Mesh (shown when mesh style active or ambient soft) */}
-        {backgroundStyle === 'mesh' && (
-          <div
-            className={`absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] ${
-              theme === 'light' ? 'opacity-35' : 'opacity-70'
-            }`}
-          />
-        )}
-      </div>
+      {/* Floating User-Friendly Toast Feedback */}
+      <ToastNotification />
 
       {/* Circuit Boot Sequence Overlay */}
       {!bootFinished && (
