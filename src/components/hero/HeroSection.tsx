@@ -104,7 +104,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, onOpenChat
           </span>
         </div>
         <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[var(--text-primary)]">
-          Elara Vance
+          Sajith Nuwan
         </h1>
         <p className="font-body text-lg sm:text-2xl text-[var(--accent-cyan)] font-medium tracking-normal">
           Software Engineer — Robotics · Edge AI/ML · Cloud Systems
